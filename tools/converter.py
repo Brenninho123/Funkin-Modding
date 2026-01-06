@@ -1,17 +1,35 @@
 import json
 import sys
+import os
+
+# =========================
+# Funções utilitárias
+# =========================
 
 def load_json(path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 def save_json(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
-def convert_vslice_to_psych(input_path, output_path, song_name="convertedSong"):
-    data = load_json(input_path)
+# =========================
+# Conversores específicos
+# =========================
 
+def convert_vslice(data):
+    return _convert_generic(data, "V-Slice")
+
+def convert_fnfc(data):
+    return _convert_generic(data, "FNFC")
+
+def convert_codename(data):
+    return _convert_generic(data, "Codename")
+
+# Conversor genérico usado por todos
+def _convert_generic(data, source_name="Generic"):
     song = data.get("song", {})
     bpm = song.get("bpm", 120)
     speed = song.get("speed", 1)
@@ -42,7 +60,7 @@ def convert_vslice_to_psych(input_path, output_path, song_name="convertedSong"):
                 "bpm": bpm
             }
 
-        # Psych lane: Player lanes 0-3, Opponent lanes 4-7
+        # Psych lane logic
         psych_lane = lane
         if not must_hit:
             psych_lane += 4
@@ -56,9 +74,9 @@ def convert_vslice_to_psych(input_path, output_path, song_name="convertedSong"):
 
         sections[section_index]["sectionNotes"].append(psych_note)
 
-    psych_chart = {
+    return {
         "song": {
-            "song": song_name,
+            "song": song.get("name", f"converted_{source_name}"),
             "bpm": bpm,
             "speed": speed,
             "needsVoices": True,
@@ -71,18 +89,55 @@ def convert_vslice_to_psych(input_path, output_path, song_name="convertedSong"):
         }
     }
 
+# =========================
+# Função principal
+# =========================
+
+def convert_chart(input_path, output_path, song_name=None, format_hint=None):
+    data = load_json(input_path)
+
+    # Detect format automaticamente se possível
+    if not format_hint:
+        if "V-Slice" in input_path or "vslice" in input_path.lower():
+            format_hint = "vslice"
+        elif "fnfc" in input_path.lower():
+            format_hint = "fnfc"
+        elif "codename" in input_path.lower():
+            format_hint = "codename"
+        else:
+            format_hint = "vslice"  # fallback
+
+    if format_hint.lower() == "vslice":
+        psych_chart = convert_vslice(data)
+    elif format_hint.lower() == "fnfc":
+        psych_chart = convert_fnfc(data)
+    elif format_hint.lower() == "codename":
+        psych_chart = convert_codename(data)
+    else:
+        raise ValueError(f"Formato desconhecido: {format_hint}")
+
+    # Sobrescreve o nome da música se fornecido
+    if song_name:
+        psych_chart["song"]["song"] = song_name
+
     save_json(output_path, psych_chart)
     print("✔ Conversão concluída!")
-    print(f"Arquivo salvo em: {output_path}")
+    print(f"✔ Arquivo salvo em: {output_path}")
+    print(f"✔ Formato detectado/forçado: {format_hint}")
 
-# CLI simples
+# =========================
+# CLI
+# =========================
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Uso: python converter.py input.json output.json [songName]")
+        print("Uso: python converter.py input.json output.json [songName] [format]")
+        print("format opcional: vslice | fnfc | codename")
         sys.exit(1)
 
-    input_json = sys.argv[1]
-    output_json = sys.argv[2]
-    song_name = sys.argv[3] if len(sys.argv) > 3 else "convertedSong"
+    input_file = sys.argv[1]
+    output_file = sys.argv[2]
+    song_name_arg = sys.argv[3] if len(sys.argv) > 3 else None
+    format_hint_arg = sys.argv[4] if len(sys.argv) > 4 else None
 
-    convert_vslice_to_psych(input_json, output_json, song_name)
+    convert_chart(input_file, output_file, song_name_arg, format_hint_arg)
