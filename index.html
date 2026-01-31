@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funkin' Converter - V Slice ⇄ Psych Engine</title>
+    <title>Funkin' Modding - V Slice ⇄ Psych Engine</title>
     <style>
         * {
             margin: 0;
@@ -42,6 +42,33 @@
         .header p {
             opacity: 0.9;
             font-size: 1.1em;
+        }
+
+        .mode-selector {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 5px;
+            max-width: 400px;
+            margin: 20px auto 0;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: white;
+            color: #667eea;
         }
 
         .tabs {
@@ -141,6 +168,19 @@
             cursor: pointer;
         }
 
+        .generation-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .generation-section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
         .input-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -180,6 +220,10 @@
             background: #5a67d8;
         }
 
+        .label-badge.generate {
+            background: #00c9ff;
+        }
+
         textarea {
             width: 100%;
             min-height: 350px;
@@ -198,36 +242,6 @@
             border-color: #667eea;
             background: white;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .file-upload {
-            border: 2px dashed #667eea;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #f8f9fa;
-        }
-
-        .file-upload:hover {
-            background: #e7f3ff;
-            border-color: #5a67d8;
-        }
-
-        .file-upload input[type="file"] {
-            display: none;
-        }
-
-        .file-upload-label {
-            cursor: pointer;
-            display: block;
-        }
-
-        .file-name {
-            margin-top: 10px;
-            color: #667eea;
-            font-weight: bold;
         }
 
         .config-section {
@@ -321,6 +335,16 @@
         .btn-convert:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
         }
 
         .btn-download {
@@ -420,6 +444,19 @@
             margin: 5px 0;
         }
 
+        .gen-info-box {
+            background: #e0f7ff;
+            border-left: 4px solid #00c9ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .gen-info-box h4 {
+            color: #0099cc;
+            margin-bottom: 10px;
+        }
+
         @media (max-width: 768px) {
             .input-section {
                 grid-template-columns: 1fr;
@@ -450,420 +487,605 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎵 Funkin' Converter</h1>
-            <p>V Slice ⇄ Psych Engine - Complete Bidirectional Conversion</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('chart')">📊 Charts</button>
-            <button class="tab" onclick="switchTab('character')">👤 Characters</button>
-            <button class="tab" onclick="switchTab('stage')">🎬 Stages</button>
-        </div>
-
-        <!-- ================ TAB: CHART CONVERTER ================ -->
-        <div id="chart-tab" class="tab-content active">
-            <div class="info-box">
-                <h4>📋 How to use Chart Converter:</h4>
-                <ul>
-                    <li>Choose the <strong>conversion direction</strong></li>
-                    <li>Paste the JSON in the appropriate field(s)</li>
-                    <li>Configure options (if needed)</li>
-                    <li>Click <strong>Convert</strong></li>
-                    <li>Download the converted files</li>
-                </ul>
-            </div>
-
-            <div class="direction-selector">
-                <h3>🔄 Conversion Direction</h3>
-                <div class="direction-options">
-                    <label class="direction-option active" id="chartDir1">
-                        <input type="radio" name="chartDirection" value="vslice-to-psych" checked onchange="updateChartDirection()">
-                        <span>V Slice → Psych Engine</span>
-                    </label>
-                    <label class="direction-option" id="chartDir2">
-                        <input type="radio" name="chartDirection" value="psych-to-vslice" onchange="updateChartDirection()">
-                        <span>Psych Engine → V Slice</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="config-section" id="chartConfigVToPsych">
-                <h3>⚙️ Chart Settings (Psych Engine)</h3>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label>Player 1 (BF):</label>
-                        <input type="text" id="player1" value="bf" placeholder="bf">
-                    </div>
-                    <div class="config-item">
-                        <label>Player 2 (Opponent):</label>
-                        <input type="text" id="player2" value="dad" placeholder="dad">
-                    </div>
-                    <div class="config-item">
-                        <label>Girlfriend:</label>
-                        <input type="text" id="gfVersion" value="gf" placeholder="gf">
-                    </div>
-                    <div class="config-item">
-                        <label>Stage:</label>
-                        <input type="text" id="stage" value="stage" placeholder="stage">
-                    </div>
-                </div>
-            </div>
-
-            <div class="config-section" id="chartConfigPToV" style="display: none;">
-                <h3>⚙️ Chart Settings (V Slice)</h3>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label>Scroll Speed:</label>
-                        <input type="number" id="scrollSpeed" value="2.7" step="0.1" placeholder="2.7">
-                    </div>
-                    <div class="config-item">
-                        <label>Artist:</label>
-                        <input type="text" id="artist" value="Unknown" placeholder="Unknown">
-                    </div>
-                    <div class="config-item">
-                        <label>Charter:</label>
-                        <input type="text" id="charter" value="Converter" placeholder="Converter">
-                    </div>
-                </div>
-            </div>
-
-            <div id="chartInputVToPsych" class="input-section">
-                <div class="input-group">
-                    <label>
-                        V Slice Chart JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="vSliceChart" placeholder='Paste V Slice Chart JSON here...'></textarea>
-                </div>
-                <div class="input-group">
-                    <label>
-                        V Slice Metadata JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="vSliceMetadata" placeholder='Paste V Slice Metadata JSON here...'></textarea>
-                </div>
-            </div>
-
-            <div id="chartInputPToV" class="input-section single" style="display: none;">
-                <div class="input-group">
-                    <label>
-                        Psych Engine Chart JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="psychChart" placeholder='Paste Psych Engine Chart JSON here...'></textarea>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-convert" onclick="convertChart()">
-                    <span>🔄</span>
-                    <span>Convert Chart</span>
-                </button>
-                <button class="btn-download" id="downloadChartBtn" onclick="downloadChart()" disabled>
-                    <span>💾</span>
-                    <span id="downloadChartText">Download</span>
-                </button>
-                <button class="btn-clear" onclick="clearChart()">
-                    <span>🗑️</span>
-                    <span>Clear</span>
-                </button>
-            </div>
-
-            <div id="chartStatus" class="status"></div>
-
-            <div class="output-section" id="chartOutputVToPsych">
-                <h3>
-                    📤 Psych Engine Chart
-                    <span class="label-badge">OUTPUT</span>
-                </h3>
-                <textarea id="outputChart" class="output-textarea" readonly placeholder="Converted chart will appear here..."></textarea>
-            </div>
-
-            <div class="output-section" id="chartOutputPToV" style="display: none;">
-                <div class="input-section">
-                    <div class="input-group">
-                        <h3>
-                            📤 V Slice Chart
-                            <span class="label-badge">OUTPUT</span>
-                        </h3>
-                        <textarea id="outputVSliceChart" class="output-textarea" readonly placeholder="V Slice Chart will appear here..."></textarea>
-                    </div>
-                    <div class="input-group">
-                        <h3>
-                            📤 V Slice Metadata
-                            <span class="label-badge">OUTPUT</span>
-                        </h3>
-                        <textarea id="outputVSliceMetadata" class="output-textarea" readonly placeholder="V Slice Metadata will appear here..."></textarea>
-                    </div>
-                </div>
+            <h1>🎮 Funkin' Modding</h1>
+            <p>V Slice ⇄ Psych Engine - Complete Modding Suite</p>
+            
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="switchMode('conversion')">🔄 Conversion</button>
+                <button class="mode-btn" onclick="switchMode('generation')">✨ Generation</button>
             </div>
         </div>
 
-        <!-- ================ TAB: CHARACTER CONVERTER ================ -->
-        <div id="character-tab" class="tab-content">
-            <div class="info-box">
-                <h4>👤 How to use Character Converter:</h4>
-                <ul>
-                    <li>Choose the <strong>conversion direction</strong></li>
-                    <li>Paste the character JSON</li>
-                    <li>Configure additional options</li>
-                    <li>Click <strong>Convert</strong></li>
-                    <li>Download the converted file</li>
-                </ul>
+        <!-- ================ MODE: CONVERSION ================ -->
+        <div id="conversion-mode" class="mode-content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('chart')">📊 Charts</button>
+                <button class="tab" onclick="switchTab('character')">👤 Characters</button>
+                <button class="tab" onclick="switchTab('stage')">🎬 Stages</button>
             </div>
 
-            <div class="direction-selector">
-                <h3>🔄 Conversion Direction</h3>
-                <div class="direction-options">
-                    <label class="direction-option active" id="charDir1">
-                        <input type="radio" name="charDirection" value="vslice-to-psych" checked onchange="updateCharDirection()">
-                        <span>V Slice → Psych Engine</span>
-                    </label>
-                    <label class="direction-option" id="charDir2">
-                        <input type="radio" name="charDirection" value="psych-to-vslice" onchange="updateCharDirection()">
-                        <span>Psych Engine → V Slice</span>
-                    </label>
+            <!-- ================ CHART CONVERTER ================ -->
+            <div id="chart-tab" class="tab-content active">
+                <div class="info-box">
+                    <h4>📋 How to use Chart Converter:</h4>
+                    <ul>
+                        <li>Choose the <strong>conversion direction</strong></li>
+                        <li>Paste the JSON in the appropriate field(s)</li>
+                        <li>Configure options (if needed)</li>
+                        <li>Click <strong>Convert</strong></li>
+                        <li>Download the converted files</li>
+                    </ul>
                 </div>
-            </div>
 
-            <div class="config-section" id="charConfigVToPsych">
-                <h3>⚙️ Additional Settings (Psych Engine)</h3>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label>Sing Duration:</label>
-                        <input type="number" id="singDuration" value="6.1" step="0.1" placeholder="6.1">
+                <div class="direction-selector">
+                    <h3>🔄 Conversion Direction</h3>
+                    <div class="direction-options">
+                        <label class="direction-option active" id="chartDir1">
+                            <input type="radio" name="chartDirection" value="vslice-to-psych" checked onchange="updateChartDirection()">
+                            <span>V Slice → Psych Engine</span>
+                        </label>
+                        <label class="direction-option" id="chartDir2">
+                            <input type="radio" name="chartDirection" value="psych-to-vslice" onchange="updateChartDirection()">
+                            <span>Psych Engine → V Slice</span>
+                        </label>
                     </div>
-                    <div class="config-item">
-                        <label>Dance Every:</label>
-                        <input type="number" id="danceEvery" value="2" placeholder="2">
-                    </div>
-                    <div class="config-item">
-                        <label>Healthbar Color:</label>
-                        <input type="color" id="healthbarColor" value="#b7d855">
-                    </div>
-                    <div class="config-item">
-                        <label>No Antialiasing:</label>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" id="noAntialiasing">
+                </div>
+
+                <div class="config-section" id="chartConfigVToPsych">
+                    <h3>⚙️ Chart Settings (Psych Engine)</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Player 1 (BF):</label>
+                            <input type="text" id="player1" value="bf" placeholder="bf">
+                        </div>
+                        <div class="config-item">
+                            <label>Player 2 (Opponent):</label>
+                            <input type="text" id="player2" value="dad" placeholder="dad">
+                        </div>
+                        <div class="config-item">
+                            <label>Girlfriend:</label>
+                            <input type="text" id="gfVersion" value="gf" placeholder="gf">
+                        </div>
+                        <div class="config-item">
+                            <label>Stage:</label>
+                            <input type="text" id="stage" value="stage" placeholder="stage">
                         </div>
                     </div>
-                    <div class="config-item">
-                        <label>Is Player:</label>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" id="isPlayer">
+                </div>
+
+                <div class="config-section" id="chartConfigPToV" style="display: none;">
+                    <h3>⚙️ Chart Settings (V Slice)</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Scroll Speed:</label>
+                            <input type="number" id="scrollSpeed" value="2.7" step="0.1" placeholder="2.7">
+                        </div>
+                        <div class="config-item">
+                            <label>Artist:</label>
+                            <input type="text" id="artist" value="Unknown" placeholder="Unknown">
+                        </div>
+                        <div class="config-item">
+                            <label>Charter:</label>
+                            <input type="text" id="charter" value="Converter" placeholder="Converter">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chartInputVToPsych" class="input-section">
+                    <div class="input-group">
+                        <label>
+                            V Slice Chart JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="vSliceChart" placeholder='Paste V Slice Chart JSON here...'></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            V Slice Metadata JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="vSliceMetadata" placeholder='Paste V Slice Metadata JSON here...'></textarea>
+                    </div>
+                </div>
+
+                <div id="chartInputPToV" class="input-section single" style="display: none;">
+                    <div class="input-group">
+                        <label>
+                            Psych Engine Chart JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="psychChart" placeholder='Paste Psych Engine Chart JSON here...'></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-convert" onclick="convertChart()">
+                        <span>🔄</span>
+                        <span>Convert Chart</span>
+                    </button>
+                    <button class="btn-download" id="downloadChartBtn" onclick="downloadChart()" disabled>
+                        <span>💾</span>
+                        <span id="downloadChartText">Download</span>
+                    </button>
+                    <button class="btn-clear" onclick="clearChart()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+
+                <div id="chartStatus" class="status"></div>
+
+                <div class="output-section" id="chartOutputVToPsych">
+                    <h3>
+                        📤 Psych Engine Chart
+                        <span class="label-badge">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputChart" class="output-textarea" readonly placeholder="Converted chart will appear here..."></textarea>
+                </div>
+
+                <div class="output-section" id="chartOutputPToV" style="display: none;">
+                    <div class="input-section">
+                        <div class="input-group">
+                            <h3>
+                                📤 V Slice Chart
+                                <span class="label-badge">OUTPUT</span>
+                            </h3>
+                            <textarea id="outputVSliceChart" class="output-textarea" readonly placeholder="V Slice Chart will appear here..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <h3>
+                                📤 V Slice Metadata
+                                <span class="label-badge">OUTPUT</span>
+                            </h3>
+                            <textarea id="outputVSliceMetadata" class="output-textarea" readonly placeholder="V Slice Metadata will appear here..."></textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="config-section" id="charConfigPToV" style="display: none;">
-                <h3>⚙️ Additional Settings (V Slice)</h3>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label>Default FPS:</label>
-                        <input type="number" id="defaultFPS" value="24" placeholder="24">
+            <!-- ================ CHARACTER CONVERTER ================ -->
+            <div id="character-tab" class="tab-content">
+                <div class="info-box">
+                    <h4>👤 How to use Character Converter:</h4>
+                    <ul>
+                        <li>Choose the <strong>conversion direction</strong></li>
+                        <li>Paste the character JSON</li>
+                        <li>Configure additional options</li>
+                        <li>Click <strong>Convert</strong></li>
+                        <li>Download the converted file</li>
+                    </ul>
+                </div>
+
+                <div class="direction-selector">
+                    <h3>🔄 Conversion Direction</h3>
+                    <div class="direction-options">
+                        <label class="direction-option active" id="charDir1">
+                            <input type="radio" name="charDirection" value="vslice-to-psych" checked onchange="updateCharDirection()">
+                            <span>V Slice → Psych Engine</span>
+                        </label>
+                        <label class="direction-option" id="charDir2">
+                            <input type="radio" name="charDirection" value="psych-to-vslice" onchange="updateCharDirection()">
+                            <span>Psych Engine → V Slice</span>
+                        </label>
                     </div>
                 </div>
-            </div>
 
-            <div class="input-section single" id="charInputVToPsych">
-                <div class="input-group">
-                    <label>
-                        V Slice Character JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="vSliceCharacter" placeholder='Paste V Slice Character JSON here...'></textarea>
-                </div>
-            </div>
-
-            <div class="input-section single" id="charInputPToV" style="display: none;">
-                <div class="input-group">
-                    <label>
-                        Psych Engine Character JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="psychCharacter" placeholder='Paste Psych Engine Character JSON here...'></textarea>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-convert" onclick="convertCharacter()">
-                    <span>🔄</span>
-                    <span>Convert Character</span>
-                </button>
-                <button class="btn-download" id="downloadCharBtn" onclick="downloadCharacter()" disabled>
-                    <span>💾</span>
-                    <span>Download Character</span>
-                </button>
-                <button class="btn-clear" onclick="clearCharacter()">
-                    <span>🗑️</span>
-                    <span>Clear</span>
-                </button>
-            </div>
-
-            <div id="charStatus" class="status"></div>
-
-            <div class="output-section" id="charOutputVToPsych">
-                <h3>
-                    📤 Psych Engine Character
-                    <span class="label-badge">OUTPUT</span>
-                </h3>
-                <textarea id="outputCharacter" class="output-textarea" readonly placeholder="Converted character will appear here..."></textarea>
-            </div>
-
-            <div class="output-section" id="charOutputPToV" style="display: none;">
-                <h3>
-                    📤 V Slice Character
-                    <span class="label-badge">OUTPUT</span>
-                </h3>
-                <textarea id="outputVSliceCharacter" class="output-textarea" readonly placeholder="V Slice character will appear here..."></textarea>
-            </div>
-        </div>
-
-        <!-- ================ TAB: STAGE CONVERTER ================ -->
-        <div id="stage-tab" class="tab-content">
-            <div class="info-box">
-                <h4>🎬 How to use Stage Converter:</h4>
-                <ul>
-                    <li>Choose the <strong>conversion direction</strong></li>
-                    <li>Paste the stage JSON (and Lua if converting from Psych)</li>
-                    <li>Configure stage settings</li>
-                    <li>Click <strong>Convert</strong></li>
-                    <li>Download the converted files</li>
-                </ul>
-            </div>
-
-            <div class="direction-selector">
-                <h3>🔄 Conversion Direction</h3>
-                <div class="direction-options">
-                    <label class="direction-option active" id="stageDir1">
-                        <input type="radio" name="stageDirection" value="vslice-to-psych" checked onchange="updateStageDirection()">
-                        <span>V Slice → Psych Engine</span>
-                    </label>
-                    <label class="direction-option" id="stageDir2">
-                        <input type="radio" name="stageDirection" value="psych-to-vslice" onchange="updateStageDirection()">
-                        <span>Psych Engine → V Slice</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="config-section" id="stageConfigVToPsych">
-                <h3>⚙️ Stage Settings (Psych Engine)</h3>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label>Generate Lua Script:</label>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" id="generateLua" checked>
-                            <span style="font-size: 0.9em; color: #666;">Creates onCreate() function with sprites</span>
+                <div class="config-section" id="charConfigVToPsych">
+                    <h3>⚙️ Additional Settings (Psych Engine)</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Sing Duration:</label>
+                            <input type="number" id="singDuration" value="6.1" step="0.1" placeholder="6.1">
+                        </div>
+                        <div class="config-item">
+                            <label>Dance Every:</label>
+                            <input type="number" id="danceEvery" value="2" placeholder="2">
+                        </div>
+                        <div class="config-item">
+                            <label>Healthbar Color:</label>
+                            <input type="color" id="healthbarColor" value="#b7d855">
+                        </div>
+                        <div class="config-item">
+                            <label>No Antialiasing:</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="noAntialiasing">
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <label>Is Player:</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="isPlayer">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="config-section" id="stageConfigPToV" style="display: none;">
-                <h3>⚙️ Stage Settings (V Slice)</h3>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label>Stage Name:</label>
-                        <input type="text" id="stageName" value="CustomStage" placeholder="CustomStage">
-                    </div>
-                    <div class="config-item">
-                        <label>Stage Directory:</label>
-                        <input type="text" id="stageDirectory" value="custom" placeholder="custom">
+                <div class="config-section" id="charConfigPToV" style="display: none;">
+                    <h3>⚙️ Additional Settings (V Slice)</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Default FPS:</label>
+                            <input type="number" id="defaultFPS" value="24" placeholder="24">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="stageInputVToPsych" class="input-section single">
-                <div class="input-group">
-                    <label>
-                        V Slice Stage JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="vSliceStage" placeholder='Paste V Slice Stage JSON here...'></textarea>
-                </div>
-            </div>
-
-            <div id="stageInputPToV" class="input-section" style="display: none;">
-                <div class="input-group">
-                    <label>
-                        Psych Engine Stage JSON
-                        <span class="label-badge">INPUT</span>
-                    </label>
-                    <textarea id="psychStage" placeholder='Paste Psych Engine Stage JSON here...'></textarea>
-                </div>
-                <div class="input-group">
-                    <label>
-                        Psych Engine Stage Lua
-                        <span class="label-badge lua">LUA</span>
-                        <span style="font-size: 0.9em; color: #666;">(Optional)</span>
-                    </label>
-                    <textarea id="psychStageLua" placeholder='Paste Psych Engine Stage Lua script here (optional)...'></textarea>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-convert" onclick="convertStage()">
-                    <span>🔄</span>
-                    <span>Convert Stage</span>
-                </button>
-                <button class="btn-download" id="downloadStageBtn" onclick="downloadStage()" disabled>
-                    <span>💾</span>
-                    <span id="downloadStageText">Download</span>
-                </button>
-                <button class="btn-clear" onclick="clearStage()">
-                    <span>🗑️</span>
-                    <span>Clear</span>
-                </button>
-            </div>
-
-            <div id="stageStatus" class="status"></div>
-
-            <div class="output-section" id="stageOutputVToPsych" style="display: block;">
-                <div class="input-section">
+                <div class="input-section single" id="charInputVToPsych">
                     <div class="input-group">
-                        <h3>
-                            📤 Psych Engine Stage JSON
-                            <span class="label-badge">OUTPUT</span>
-                        </h3>
-                        <textarea id="outputStageJSON" class="output-textarea" readonly placeholder="Psych Engine Stage JSON will appear here..."></textarea>
+                        <label>
+                            V Slice Character JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="vSliceCharacter" placeholder='Paste V Slice Character JSON here...'></textarea>
                     </div>
+                </div>
+
+                <div class="input-section single" id="charInputPToV" style="display: none;">
                     <div class="input-group">
-                        <h3>
-                            📤 Psych Engine Stage Lua
-                            <span class="label-badge lua">OUTPUT</span>
-                        </h3>
-                        <textarea id="outputStageLua" class="output-textarea" readonly placeholder="Psych Engine Stage Lua script will appear here..."></textarea>
+                        <label>
+                            Psych Engine Character JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="psychCharacter" placeholder='Paste Psych Engine Character JSON here...'></textarea>
                     </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-convert" onclick="convertCharacter()">
+                        <span>🔄</span>
+                        <span>Convert Character</span>
+                    </button>
+                    <button class="btn-download" id="downloadCharBtn" onclick="downloadCharacter()" disabled>
+                        <span>💾</span>
+                        <span>Download Character</span>
+                    </button>
+                    <button class="btn-clear" onclick="clearCharacter()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+
+                <div id="charStatus" class="status"></div>
+
+                <div class="output-section" id="charOutputVToPsych">
+                    <h3>
+                        📤 Psych Engine Character
+                        <span class="label-badge">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputCharacter" class="output-textarea" readonly placeholder="Converted character will appear here..."></textarea>
+                </div>
+
+                <div class="output-section" id="charOutputPToV" style="display: none;">
+                    <h3>
+                        📤 V Slice Character
+                        <span class="label-badge">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputVSliceCharacter" class="output-textarea" readonly placeholder="V Slice character will appear here..."></textarea>
                 </div>
             </div>
 
-            <div class="output-section" id="stageOutputPToV" style="display: none;">
-                <h3>
-                    📤 V Slice Stage
-                    <span class="label-badge">OUTPUT</span>
-                </h3>
-                <textarea id="outputVSliceStage" class="output-textarea" readonly placeholder="V Slice Stage will appear here..."></textarea>
+            <!-- ================ STAGE CONVERTER ================ -->
+            <div id="stage-tab" class="tab-content">
+                <div class="info-box">
+                    <h4>🎬 How to use Stage Converter:</h4>
+                    <ul>
+                        <li>Choose the <strong>conversion direction</strong></li>
+                        <li>Paste the stage JSON (and Lua if converting from Psych)</li>
+                        <li>Configure stage settings</li>
+                        <li>Click <strong>Convert</strong></li>
+                        <li>Download the converted files</li>
+                    </ul>
+                </div>
+
+                <div class="direction-selector">
+                    <h3>🔄 Conversion Direction</h3>
+                    <div class="direction-options">
+                        <label class="direction-option active" id="stageDir1">
+                            <input type="radio" name="stageDirection" value="vslice-to-psych" checked onchange="updateStageDirection()">
+                            <span>V Slice → Psych Engine</span>
+                        </label>
+                        <label class="direction-option" id="stageDir2">
+                            <input type="radio" name="stageDirection" value="psych-to-vslice" onchange="updateStageDirection()">
+                            <span>Psych Engine → V Slice</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="config-section" id="stageConfigVToPsych">
+                    <h3>⚙️ Stage Settings (Psych Engine)</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Generate Lua Script:</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="generateLua" checked>
+                                <span style="font-size: 0.9em; color: #666;">Creates onCreate() function with sprites</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section" id="stageConfigPToV" style="display: none;">
+                    <h3>⚙️ Stage Settings (V Slice)</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Stage Name:</label>
+                            <input type="text" id="stageName" value="CustomStage" placeholder="CustomStage">
+                        </div>
+                        <div class="config-item">
+                            <label>Stage Directory:</label>
+                            <input type="text" id="stageDirectory" value="custom" placeholder="custom">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stageInputVToPsych" class="input-section single">
+                    <div class="input-group">
+                        <label>
+                            V Slice Stage JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="vSliceStage" placeholder='Paste V Slice Stage JSON here...'></textarea>
+                    </div>
+                </div>
+
+                <div id="stageInputPToV" class="input-section" style="display: none;">
+                    <div class="input-group">
+                        <label>
+                            Psych Engine Stage JSON
+                            <span class="label-badge">INPUT</span>
+                        </label>
+                        <textarea id="psychStage" placeholder='Paste Psych Engine Stage JSON here...'></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            Psych Engine Stage Lua
+                            <span class="label-badge lua">LUA</span>
+                            <span style="font-size: 0.9em; color: #666;">(Optional)</span>
+                        </label>
+                        <textarea id="psychStageLua" placeholder='Paste Psych Engine Stage Lua script here (optional)...'></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-convert" onclick="convertStage()">
+                        <span>🔄</span>
+                        <span>Convert Stage</span>
+                    </button>
+                    <button class="btn-download" id="downloadStageBtn" onclick="downloadStage()" disabled>
+                        <span>💾</span>
+                        <span id="downloadStageText">Download</span>
+                    </button>
+                    <button class="btn-clear" onclick="clearStage()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+
+                <div id="stageStatus" class="status"></div>
+
+                <div class="output-section" id="stageOutputVToPsych" style="display: block;">
+                    <div class="input-section">
+                        <div class="input-group">
+                            <h3>
+                                📤 Psych Engine Stage JSON
+                                <span class="label-badge">OUTPUT</span>
+                            </h3>
+                            <textarea id="outputStageJSON" class="output-textarea" readonly placeholder="Psych Engine Stage JSON will appear here..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <h3>
+                                📤 Psych Engine Stage Lua
+                                <span class="label-badge lua">OUTPUT</span>
+                            </h3>
+                            <textarea id="outputStageLua" class="output-textarea" readonly placeholder="Psych Engine Stage Lua script will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="output-section" id="stageOutputPToV" style="display: none;">
+                    <h3>
+                        📤 V Slice Stage
+                        <span class="label-badge">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputVSliceStage" class="output-textarea" readonly placeholder="V Slice Stage will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================ MODE: GENERATION ================ -->
+        <div id="generation-mode" class="mode-content" style="display: none;">
+            <div class="tabs">
+                <button class="tab active" onclick="switchGenTab('gen-chart')">📊 Chart Generator</button>
+                <button class="tab" onclick="switchGenTab('gen-character')">👤 Character Generator</button>
+                <button class="tab" onclick="switchGenTab('gen-stage')">🎬 Stage Generator</button>
+            </div>
+
+            <!-- ================ CHART GENERATOR ================ -->
+            <div id="gen-chart-tab" class="tab-content active">
+                <div class="gen-info-box">
+                    <h4>✨ Chart Generator - Psych Engine</h4>
+                    <ul>
+                        <li>Configure your song settings (BPM, name, characters)</li>
+                        <li>Set the number of sections you want</li>
+                        <li>Choose generation mode (empty or with sample notes)</li>
+                        <li>Click <strong>Generate</strong> to create your chart</li>
+                        <li>Download and use in Psych Engine!</li>
+                    </ul>
+                </div>
+
+                <div class="config-section">
+                    <h3>🎵 Song Settings</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Song Name:</label>
+                            <input type="text" id="genSongName" value="New Song" placeholder="New Song">
+                        </div>
+                        <div class="config-item">
+                            <label>BPM:</label>
+                            <input type="number" id="genBPM" value="150" min="1" max="300" placeholder="150">
+                        </div>
+                        <div class="config-item">
+                            <label>Scroll Speed:</label>
+                            <input type="number" id="genSpeed" value="2.5" step="0.1" min="0.5" max="5" placeholder="2.5">
+                        </div>
+                        <div class="config-item">
+                            <label>Number of Sections:</label>
+                            <input type="number" id="genSections" value="8" min="1" max="100" placeholder="8">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>👥 Characters</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Player 1 (Boyfriend):</label>
+                            <input type="text" id="genPlayer1" value="bf" placeholder="bf">
+                        </div>
+                        <div class="config-item">
+                            <label>Player 2 (Opponent):</label>
+                            <input type="text" id="genPlayer2" value="dad" placeholder="dad">
+                        </div>
+                        <div class="config-item">
+                            <label>Girlfriend:</label>
+                            <input type="text" id="genGF" value="gf" placeholder="gf">
+                        </div>
+                        <div class="config-item">
+                            <label>Stage:</label>
+                            <input type="text" id="genStage" value="stage" placeholder="stage">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generation-section">
+                    <h3>✨ Generation Mode</h3>
+                    <div class="direction-options">
+                        <label class="direction-option active" id="genMode1">
+                            <input type="radio" name="genMode" value="empty" checked onchange="updateGenMode()">
+                            <span>Empty Chart (No Notes)</span>
+                        </label>
+                        <label class="direction-option" id="genMode2">
+                            <input type="radio" name="genMode" value="sample" onchange="updateGenMode()">
+                            <span>Sample Notes (Basic Pattern)</span>
+                        </label>
+                        <label class="direction-option" id="genMode3">
+                            <input type="radio" name="genMode" value="random" onchange="updateGenMode()">
+                            <span>Random Notes (Auto-Generated)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="config-section" id="randomGenSettings" style="display: none;">
+                    <h3>🎲 Random Generation Settings</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Notes Density:</label>
+                            <select id="genDensity">
+                                <option value="low">Low (Sparse)</option>
+                                <option value="medium" selected>Medium (Balanced)</option>
+                                <option value="high">High (Dense)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>Include Sustains:</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="genSustains" checked>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <label>Alternate Sections:</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="genAlternate" checked>
+                                <span style="font-size: 0.85em; color: #666;">Player/Opponent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-generate" onclick="generateChart()">
+                        <span>✨</span>
+                        <span>Generate Chart</span>
+                    </button>
+                    <button class="btn-download" id="downloadGenChartBtn" onclick="downloadGenChart()" disabled>
+                        <span>💾</span>
+                        <span>Download Chart</span>
+                    </button>
+                    <button class="btn-clear" onclick="clearGenChart()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+
+                <div id="genChartStatus" class="status"></div>
+
+                <div class="output-section">
+                    <h3>
+                        📤 Generated Chart
+                        <span class="label-badge generate">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputGenChart" class="output-textarea" readonly placeholder="Generated chart will appear here..."></textarea>
+                </div>
+            </div>
+
+            <!-- Character and Stage generators placeholders -->
+            <div id="gen-character-tab" class="tab-content">
+                <div class="gen-info-box">
+                    <h4>✨ Character Generator - Coming Soon!</h4>
+                    <p>This feature is under development. You can use the Character Converter in the Conversion mode.</p>
+                </div>
+            </div>
+
+            <div id="gen-stage-tab" class="tab-content">
+                <div class="gen-info-box">
+                    <h4>✨ Stage Generator - Coming Soon!</h4>
+                    <p>This feature is under development. You can use the Stage Converter in the Conversion mode.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const state = {
+            mode: 'conversion',
             chart: { direction: 'vslice-to-psych', convertedData: null },
             character: { direction: 'vslice-to-psych', convertedData: null },
-            stage: { direction: 'vslice-to-psych', convertedData: null }
+            stage: { direction: 'vslice-to-psych', convertedData: null },
+            generation: { chart: null }
         };
+
+        // ==================== MODE SWITCHING ====================
+        function switchMode(mode) {
+            state.mode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('conversion-mode').style.display = mode === 'conversion' ? 'block' : 'none';
+            document.getElementById('generation-mode').style.display = mode === 'generation' ? 'block' : 'none';
+        }
 
         // ==================== TAB SWITCHING ====================
         function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('#conversion-mode .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('#conversion-mode .tab-content').forEach(content => content.classList.remove('active'));
 
             const tabs = ['chart', 'character', 'stage'];
             const index = tabs.indexOf(tabName);
             if (index !== -1) {
-                document.querySelector(`.tab:nth-child(${index + 1})`).classList.add('active');
+                document.querySelectorAll('#conversion-mode .tab')[index].classList.add('active');
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            }
+        }
+
+        function switchGenTab(tabName) {
+            document.querySelectorAll('#generation-mode .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('#generation-mode .tab-content').forEach(content => content.classList.remove('active'));
+
+            const tabs = ['gen-chart', 'gen-character', 'gen-stage'];
+            const index = tabs.indexOf(tabName);
+            if (index !== -1) {
+                document.querySelectorAll('#generation-mode .tab')[index].classList.add('active');
                 document.getElementById(`${tabName}-tab`).classList.add('active');
             }
         }
@@ -917,6 +1139,147 @@
             document.getElementById('stageOutputPToV').style.display = isVToP ? 'none' : 'block';
             document.getElementById('downloadStageText').textContent = isVToP ? 'Download Files' : 'Download Stage';
             clearStage();
+        }
+
+        // ==================== GENERATION MODE ====================
+        function updateGenMode() {
+            const mode = document.querySelector('input[name="genMode"]:checked').value;
+            
+            document.getElementById('genMode1').classList.toggle('active', mode === 'empty');
+            document.getElementById('genMode2').classList.toggle('active', mode === 'sample');
+            document.getElementById('genMode3').classList.toggle('active', mode === 'random');
+            
+            document.getElementById('randomGenSettings').style.display = mode === 'random' ? 'block' : 'none';
+        }
+
+        function generateChart() {
+            try {
+                const songName = document.getElementById('genSongName').value || 'New Song';
+                const bpm = parseFloat(document.getElementById('genBPM').value) || 150;
+                const speed = parseFloat(document.getElementById('genSpeed').value) || 2.5;
+                const numSections = parseInt(document.getElementById('genSections').value) || 8;
+                const player1 = document.getElementById('genPlayer1').value || 'bf';
+                const player2 = document.getElementById('genPlayer2').value || 'dad';
+                const gfVersion = document.getElementById('genGF').value || 'gf';
+                const stage = document.getElementById('genStage').value || 'stage';
+                const genMode = document.querySelector('input[name="genMode"]:checked').value;
+
+                const sections = [];
+                const msPerBeat = 60000 / bpm;
+                const msPerSection = msPerBeat * 4;
+
+                for (let i = 0; i < numSections; i++) {
+                    const sectionStartTime = i * msPerSection;
+                    let sectionNotes = [];
+
+                    if (genMode === 'sample') {
+                        sectionNotes = generateSampleNotes(sectionStartTime, msPerBeat, i % 2 === 1);
+                    } else if (genMode === 'random') {
+                        const density = document.getElementById('genDensity').value;
+                        const includeSustains = document.getElementById('genSustains').checked;
+                        sectionNotes = generateRandomNotes(sectionStartTime, msPerBeat, i % 2 === 1, density, includeSustains);
+                    }
+
+                    sections.push({
+                        sectionNotes: sectionNotes,
+                        sectionBeats: 4,
+                        lengthInSteps: 16,
+                        mustHitSection: i % 2 === 1,
+                        gfSection: false,
+                        bpm: bpm,
+                        changeBPM: false,
+                        altAnim: false
+                    });
+                }
+
+                const chart = {
+                    song: {
+                        song: songName,
+                        notes: sections,
+                        bpm: bpm,
+                        needsVoices: true,
+                        player1: player1,
+                        player2: player2,
+                        gfVersion: gfVersion,
+                        speed: speed,
+                        stage: stage,
+                        validScore: true
+                    }
+                };
+
+                document.getElementById('outputGenChart').value = JSON.stringify(chart, null, '\t');
+                state.generation.chart = chart;
+                document.getElementById('downloadGenChartBtn').disabled = false;
+
+                showStatus('✅ Chart generated successfully!', 'success', 'genChartStatus');
+            } catch (error) {
+                showStatus('❌ Generation error: ' + error.message, 'error', 'genChartStatus');
+                console.error(error);
+            }
+        }
+
+        function generateSampleNotes(startTime, msPerBeat, isPlayer) {
+            const notes = [];
+            const baseOffset = isPlayer ? 4 : 0;
+
+            for (let i = 0; i < 4; i++) {
+                const time = startTime + (i * msPerBeat);
+                const direction = (i % 4) + baseOffset;
+                notes.push([time, direction, 0]);
+            }
+
+            return notes;
+        }
+
+        function generateRandomNotes(startTime, msPerBeat, isPlayer, density, includeSustains) {
+            const notes = [];
+            const baseOffset = isPlayer ? 4 : 0;
+            
+            let noteCount;
+            switch(density) {
+                case 'low': noteCount = 4; break;
+                case 'medium': noteCount = 8; break;
+                case 'high': noteCount = 12; break;
+                default: noteCount = 8;
+            }
+
+            const beatsPerSection = 4;
+
+            for (let i = 0; i < noteCount; i++) {
+                const beatPosition = Math.random() * beatsPerSection;
+                const time = startTime + (beatPosition * msPerBeat);
+                const direction = Math.floor(Math.random() * 4) + baseOffset;
+                
+                let sustain = 0;
+                if (includeSustains && Math.random() > 0.7) {
+                    sustain = msPerBeat * (Math.random() * 2);
+                }
+
+                notes.push([time, direction, sustain]);
+            }
+
+            notes.sort((a, b) => a[0] - b[0]);
+
+            return notes;
+        }
+
+        function downloadGenChart() {
+            if (!state.generation.chart) {
+                showStatus('❌ No chart to download', 'error', 'genChartStatus');
+                return;
+            }
+
+            const songName = state.generation.chart.song.song || 'new-song';
+            const filename = `${songName.toLowerCase().replace(/\s+/g, '-')}.json`;
+            downloadJSON(state.generation.chart, filename);
+            showStatus('✅ Chart download started!', 'success', 'genChartStatus');
+        }
+
+        function clearGenChart() {
+            document.getElementById('outputGenChart').value = '';
+            document.getElementById('downloadGenChartBtn').disabled = true;
+            state.generation.chart = null;
+            hideStatus('genChartStatus');
         }
 
         // ==================== CHART CONVERTER ====================
@@ -1110,7 +1473,7 @@
                     previewStart: 0,
                     previewEnd: 0
                 },
-                generatedBy: "Funkin' Converter",
+                generatedBy: "Funkin' Modding",
                 timeFormat: "ms",
                 timeChanges: [
                     {
@@ -1382,7 +1745,6 @@
         function vSliceStageToPsychEngine(vSliceStage) {
             const generateLua = document.getElementById('generateLua').checked;
             
-            // Create JSON
             const json = {
                 directory: vSliceStage.directory || "",
                 defaultZoom: vSliceStage.cameraZoom || 0.9,
@@ -1397,12 +1759,10 @@
                 camera_speed: 1
             };
 
-            // Generate Lua script
             let lua = '';
             if (generateLua && vSliceStage.props) {
                 lua = `function onCreate()\n`;
                 
-                // Sort props by zIndex
                 const sortedProps = [...vSliceStage.props].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
                 
                 sortedProps.forEach((prop, index) => {
@@ -1434,7 +1794,6 @@
                         lua += `    setScrollFactor('${spriteName}', ${scrollX}, ${scrollY})\n`;
                     }
                     
-                    // Determine if sprite is in front (zIndex > character zIndex)
                     const charZIndex = vSliceStage.characters?.bf?.zIndex || 300;
                     const inFront = (prop.zIndex || 0) > charZIndex;
                     
@@ -1455,7 +1814,6 @@
             
             const props = [];
             
-            // Parse Lua script if provided
             if (luaScript) {
                 const sprites = parseLuaSprites(luaScript);
                 sprites.forEach((sprite, index) => {
@@ -1510,7 +1868,6 @@
             lines.forEach(line => {
                 line = line.trim();
 
-                // makeLuaSprite
                 const spriteMatch = line.match(/makeLuaSprite\('([^']+)',\s*'([^']+)',\s*([-\d.]+),\s*([-\d.]+)\)/);
                 if (spriteMatch) {
                     if (currentSprite) sprites.push(currentSprite);
@@ -1528,31 +1885,26 @@
 
                 if (!currentSprite) return;
 
-                // scaleObject
                 const scaleMatch = line.match(/scaleObject\('[^']+',\s*([-\d.]+),\s*([-\d.]+)\)/);
                 if (scaleMatch) {
                     currentSprite.scale = [parseFloat(scaleMatch[1]), parseFloat(scaleMatch[2])];
                 }
 
-                // setProperty alpha
                 const alphaMatch = line.match(/setProperty\('[^']+\.alpha',\s*([-\d.]+)\)/);
                 if (alphaMatch) {
                     currentSprite.alpha = parseFloat(alphaMatch[1]);
                 }
 
-                // setScrollFactor
                 const scrollMatch = line.match(/setScrollFactor\('[^']+',\s*([-\d.]+),\s*([-\d.]+)\)/);
                 if (scrollMatch) {
                     currentSprite.scroll = [parseFloat(scrollMatch[1]), parseFloat(scrollMatch[2])];
                 }
 
-                // addLuaSprite
                 const addMatch = line.match(/addLuaSprite\('[^']+',\s*(true|false)\)/);
                 if (addMatch) {
                     currentSprite.inFront = addMatch[1] === 'true';
                 }
 
-                // antialiasing check (if missing, it's pixel art)
                 if (line.includes('antialiasing')) {
                     currentSprite.isPixel = false;
                 }
