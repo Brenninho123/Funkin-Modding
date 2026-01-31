@@ -1,6 +1,6 @@
-# Funkin-Converter
-Welcome to Funkin' Converter, officially moderated by Brenninho.
+# Funkin Modding
+Welcome to Funkin' Modding, officially moderated by Brenninho.
 
-# Funkin Converter Devs
+# Funkin Modding Devs
 
 • Brenninho: Owner/Coder
