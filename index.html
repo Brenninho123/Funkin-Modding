@@ -560,7 +560,7 @@
                 <button class="tab" onclick="switchTab('stage')">🎬 Stages</button>
             </div>
 
-            <!-- CHART CONVERTER -->
+            <!-- ================ CHART CONVERTER ================ -->
             <div id="chart-tab" class="tab-content active">
                 <div class="info-box">
                     <h4>📋 How to use Chart Converter:</h4>
@@ -699,7 +699,7 @@
                 </div>
             </div>
 
-            <!-- CHARACTER CONVERTER -->
+            <!-- ================ CHARACTER CONVERTER ================ -->
             <div id="character-tab" class="tab-content">
                 <div class="info-box">
                     <h4>👤 How to use Character Converter:</h4>
@@ -820,7 +820,7 @@
                 </div>
             </div>
 
-            <!-- STAGE CONVERTER -->
+            <!-- ================ STAGE CONVERTER ================ -->
             <div id="stage-tab" class="tab-content">
                 <div class="info-box">
                     <h4>🎬 How to use Stage Converter:</h4>
@@ -954,9 +954,10 @@
                 <button class="tab active" onclick="switchGenTab('gen-chart')">📊 Chart Generator</button>
                 <button class="tab" onclick="switchGenTab('gen-character')">👤 Character Generator</button>
                 <button class="tab" onclick="switchGenTab('gen-stage')">🎬 Stage Generator</button>
+                <button class="tab" onclick="switchGenTab('gen-lua')">📜 Lua Generator</button>
             </div>
 
-            <!-- CHART GENERATOR -->
+            <!-- ================ CHART GENERATOR ================ -->
             <div id="gen-chart-tab" class="tab-content active">
                 <div class="gen-info-box">
                     <h4>✨ Chart Generator - Psych Engine</h4>
@@ -1084,7 +1085,7 @@
                 </div>
             </div>
 
-            <!-- CHARACTER GENERATOR -->
+            <!-- ================ CHARACTER GENERATOR ================ -->
             <div id="gen-character-tab" class="tab-content">
                 <div class="gen-info-box">
                     <h4>✨ Character Generator - Psych Engine</h4>
@@ -1264,11 +1265,195 @@
                 </div>
             </div>
 
-            <!-- STAGE GENERATOR -->
+            <!-- ================ STAGE GENERATOR ================ -->
             <div id="gen-stage-tab" class="tab-content">
                 <div class="gen-info-box">
-                    <h4>✨ Stage Generator - Coming Soon!</h4>
-                    <p>This feature is under development. You can use the Stage Converter in the Conversion mode.</p>
+                    <h4>✨ Stage Generator - Psych Engine</h4>
+                    <ul>
+                        <li>Configure stage settings (zoom, directory, UI)</li>
+                        <li>Set character positions (BF, GF, Opponent)</li>
+                        <li>Configure camera offsets and speed</li>
+                        <li>Click <strong>Generate</strong> to create your stage</li>
+                        <li>Download and use in Psych Engine!</li>
+                    </ul>
+                </div>
+
+                <div class="config-section">
+                    <h3>🎬 Basic Settings</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Directory:</label>
+                            <input type="text" id="genStageDir" value="" placeholder="Leave empty for default">
+                        </div>
+                        <div class="config-item">
+                            <label>Default Zoom:</label>
+                            <input type="number" id="genStageZoom" value="0.9" step="0.1" placeholder="0.9">
+                        </div>
+                        <div class="config-item">
+                            <label>Stage UI:</label>
+                            <input type="text" id="genStageUI" value="" placeholder="normal">
+                        </div>
+                        <div class="config-item">
+                            <label>Camera Speed:</label>
+                            <input type="number" id="genStageCamSpeed" value="1" step="0.1" placeholder="1">
+                        </div>
+                        <div class="config-item">
+                            <label>Hide Girlfriend:</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="genStageHideGF">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>📍 Character Positions</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Boyfriend X:</label>
+                            <input type="number" id="genStageBFX" value="770" placeholder="770">
+                        </div>
+                        <div class="config-item">
+                            <label>Boyfriend Y:</label>
+                            <input type="number" id="genStageBFY" value="100" placeholder="100">
+                        </div>
+                        <div class="config-item">
+                            <label>Girlfriend X:</label>
+                            <input type="number" id="genStageGFX" value="400" placeholder="400">
+                        </div>
+                        <div class="config-item">
+                            <label>Girlfriend Y:</label>
+                            <input type="number" id="genStageGFY" value="130" placeholder="130">
+                        </div>
+                        <div class="config-item">
+                            <label>Opponent X:</label>
+                            <input type="number" id="genStageDadX" value="100" placeholder="100">
+                        </div>
+                        <div class="config-item">
+                            <label>Opponent Y:</label>
+                            <input type="number" id="genStageDadY" value="100" placeholder="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>📷 Camera Offsets</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>BF Camera X:</label>
+                            <input type="number" id="genStageBFCamX" value="0" placeholder="0">
+                        </div>
+                        <div class="config-item">
+                            <label>BF Camera Y:</label>
+                            <input type="number" id="genStageBFCamY" value="0" placeholder="0">
+                        </div>
+                        <div class="config-item">
+                            <label>GF Camera X:</label>
+                            <input type="number" id="genStageGFCamX" value="0" placeholder="0">
+                        </div>
+                        <div class="config-item">
+                            <label>GF Camera Y:</label>
+                            <input type="number" id="genStageGFCamY" value="0" placeholder="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Opponent Camera X:</label>
+                            <input type="number" id="genStageDadCamX" value="0" placeholder="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Opponent Camera Y:</label>
+                            <input type="number" id="genStageDadCamY" value="0" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-generate" onclick="generateStage()">
+                        <span>✨</span>
+                        <span>Generate Stage</span>
+                    </button>
+                    <button class="btn-download" id="downloadGenStageBtn" onclick="downloadGenStage()" disabled>
+                        <span>💾</span>
+                        <span>Download Stage</span>
+                    </button>
+                    <button class="btn-clear" onclick="clearGenStage()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+
+                <div id="genStageStatus" class="status"></div>
+
+                <div class="output-section">
+                    <h3>
+                        📤 Generated Stage
+                        <span class="label-badge generate">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputGenStage" class="output-textarea" readonly placeholder="Generated stage will appear here..."></textarea>
+                </div>
+            </div>
+
+            <!-- ================ LUA GENERATOR ================ -->
+            <div id="gen-lua-tab" class="tab-content">
+                <div class="gen-info-box">
+                    <h4>✨ Lua Script Generator - Psych Engine</h4>
+                    <ul>
+                        <li>Choose from pre-built Lua script templates</li>
+                        <li>Useful scripts for common modding tasks</li>
+                        <li>Click <strong>Generate</strong> to create the script</li>
+                        <li>Download and add to your mod!</li>
+                    </ul>
+                </div>
+
+                <div class="generation-section">
+                    <h3>📜 Script Templates</h3>
+                    <div class="direction-options">
+                        <label class="direction-option active" id="luaTemplate1">
+                            <input type="radio" name="luaTemplate" value="ghost" checked onchange="updateLuaTemplate()">
+                            <span>Ghost Tapping Effect</span>
+                        </label>
+                        <label class="direction-option" id="luaTemplate2">
+                            <input type="radio" name="luaTemplate" value="camera" onchange="updateLuaTemplate()">
+                            <span>Camera Zoom/Shake</span>
+                        </label>
+                        <label class="direction-option" id="luaTemplate3">
+                            <input type="radio" name="luaTemplate" value="hud" onchange="updateLuaTemplate()">
+                            <span>HUD Management</span>
+                        </label>
+                        <label class="direction-option" id="luaTemplate4">
+                            <input type="radio" name="luaTemplate" value="custom" onchange="updateLuaTemplate()">
+                            <span>Custom Events</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="config-section" id="luaDescription">
+                    <h3>ℹ️ Script Description</h3>
+                    <p id="luaDescText">Creates a ghost tapping effect where a semi-transparent copy of the character appears on note hits.</p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-generate" onclick="generateLua()">
+                        <span>✨</span>
+                        <span>Generate Lua Script</span>
+                    </button>
+                    <button class="btn-download" id="downloadGenLuaBtn" onclick="downloadGenLua()" disabled>
+                        <span>💾</span>
+                        <span>Download Script</span>
+                    </button>
+                    <button class="btn-clear" onclick="clearGenLua()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+
+                <div id="genLuaStatus" class="status"></div>
+
+                <div class="output-section">
+                    <h3>
+                        📤 Generated Lua Script
+                        <span class="label-badge lua">OUTPUT</span>
+                    </h3>
+                    <textarea id="outputGenLua" class="output-textarea" readonly placeholder="Generated Lua script will appear here..."></textarea>
                 </div>
             </div>
         </div>
@@ -1283,6 +1468,8 @@
             generation: { 
                 chart: null,
                 character: null,
+                stage: null,
+                lua: null,
                 customAnimations: []
             }
         };
@@ -1315,7 +1502,7 @@
             document.querySelectorAll('#generation-mode .tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('#generation-mode .tab-content').forEach(content => content.classList.remove('active'));
 
-            const tabs = ['gen-chart', 'gen-character', 'gen-stage'];
+            const tabs = ['gen-chart', 'gen-character', 'gen-stage', 'gen-lua'];
             const index = tabs.indexOf(tabName);
             if (index !== -1) {
                 document.querySelectorAll('#generation-mode .tab')[index].classList.add('active');
@@ -2366,6 +2553,352 @@
             state.generation.customAnimations = [];
             updateAnimationList();
             hideStatus('genCharStatus');
+        }
+
+        // ==================== STAGE GENERATOR ====================
+        function generateStage() {
+            try {
+                const directory = document.getElementById('genStageDir').value || "";
+                const defaultZoom = parseFloat(document.getElementById('genStageZoom').value) || 0.9;
+                const stageUI = document.getElementById('genStageUI').value || "";
+                const camSpeed = parseFloat(document.getElementById('genStageCamSpeed').value) || 1;
+                const hideGF = document.getElementById('genStageHideGF').checked;
+
+                const bfX = parseInt(document.getElementById('genStageBFX').value) || 770;
+                const bfY = parseInt(document.getElementById('genStageBFY').value) || 100;
+                const gfX = parseInt(document.getElementById('genStageGFX').value) || 400;
+                const gfY = parseInt(document.getElementById('genStageGFY').value) || 130;
+                const dadX = parseInt(document.getElementById('genStageDadX').value) || 100;
+                const dadY = parseInt(document.getElementById('genStageDadY').value) || 100;
+
+                const bfCamX = parseInt(document.getElementById('genStageBFCamX').value) || 0;
+                const bfCamY = parseInt(document.getElementById('genStageBFCamY').value) || 0;
+                const gfCamX = parseInt(document.getElementById('genStageGFCamX').value) || 0;
+                const gfCamY = parseInt(document.getElementById('genStageGFCamY').value) || 0;
+                const dadCamX = parseInt(document.getElementById('genStageDadCamX').value) || 0;
+                const dadCamY = parseInt(document.getElementById('genStageDadCamY').value) || 0;
+
+                const stage = {
+                    directory: directory,
+                    defaultZoom: defaultZoom,
+                    stageUI: stageUI,
+                    boyfriend: [bfX, bfY],
+                    girlfriend: [gfX, gfY],
+                    opponent: [dadX, dadY],
+                    hide_girlfriend: hideGF,
+                    camera_boyfriend: [bfCamX, bfCamY],
+                    camera_opponent: [dadCamX, dadCamY],
+                    camera_girlfriend: [gfCamX, gfCamY],
+                    camera_speed: camSpeed,
+                    preload: {}
+                };
+
+                document.getElementById('outputGenStage').value = JSON.stringify(stage, null, '\t');
+                state.generation.stage = stage;
+                document.getElementById('downloadGenStageBtn').disabled = false;
+
+                showStatus('✅ Stage generated successfully!', 'success', 'genStageStatus');
+            } catch (error) {
+                showStatus('❌ Generation error: ' + error.message, 'error', 'genStageStatus');
+                console.error(error);
+            }
+        }
+
+        function downloadGenStage() {
+            if (!state.generation.stage) {
+                showStatus('❌ No stage to download', 'error', 'genStageStatus');
+                return;
+            }
+
+            const filename = 'stage.json';
+            downloadJSON(state.generation.stage, filename);
+            showStatus('✅ Stage download started!', 'success', 'genStageStatus');
+        }
+
+        function clearGenStage() {
+            document.getElementById('outputGenStage').value = '';
+            document.getElementById('downloadGenStageBtn').disabled = true;
+            state.generation.stage = null;
+            hideStatus('genStageStatus');
+        }
+
+        // ==================== LUA GENERATOR ====================
+        function updateLuaTemplate() {
+            const template = document.querySelector('input[name="luaTemplate"]:checked').value;
+            
+            document.getElementById('luaTemplate1').classList.toggle('active', template === 'ghost');
+            document.getElementById('luaTemplate2').classList.toggle('active', template === 'camera');
+            document.getElementById('luaTemplate3').classList.toggle('active', template === 'hud');
+            document.getElementById('luaTemplate4').classList.toggle('active', template === 'custom');
+
+            const descriptions = {
+                ghost: 'Creates a ghost tapping effect where a semi-transparent copy of the character appears on note hits.',
+                camera: 'Adds camera zoom and shake effects synchronized with the music beat.',
+                hud: 'Manages HUD visibility, positioning, and custom elements on screen.',
+                custom: 'Template for creating custom events that trigger at specific times during the song.'
+            };
+
+            document.getElementById('luaDescText').textContent = descriptions[template];
+        }
+
+        function generateLua() {
+            try {
+                const template = document.querySelector('input[name="luaTemplate"]:checked').value;
+                let luaScript = '';
+
+                switch(template) {
+                    case 'ghost':
+                        luaScript = getLuaGhostTemplate();
+                        break;
+                    case 'camera':
+                        luaScript = getLuaCameraTemplate();
+                        break;
+                    case 'hud':
+                        luaScript = getLuaHUDTemplate();
+                        break;
+                    case 'custom':
+                        luaScript = getLuaCustomEventTemplate();
+                        break;
+                }
+
+                document.getElementById('outputGenLua').value = luaScript;
+                state.generation.lua = luaScript;
+                document.getElementById('downloadGenLuaBtn').disabled = false;
+
+                showStatus('✅ Lua script generated successfully!', 'success', 'genLuaStatus');
+            } catch (error) {
+                showStatus('❌ Generation error: ' + error.message, 'error', 'genLuaStatus');
+                console.error(error);
+            }
+        }
+
+        function getLuaGhostTemplate() {
+            return `local boyfriendGhostData = {}
+local dadGhostData = {}
+local gfGhostData = {}
+
+function goodNoteHit(id, direction, noteType, isSustainNote)
+    local strumTime = getPropertyFromGroup('notes', id, 'strumTime')
+    local noteType = getPropertyFromGroup('notes', id, 'noteType')
+
+    local isGF = getPropertyFromGroup('notes', id, 'gfNote') or noteType == 'Gf Sing'
+
+    -- BOYFRIEND or DAD
+    if not isSustainNote and not isGF then
+        if strumTime == boyfriendGhostData.strumTime then
+            createGhost(getProperty('characterPlayingAsDad') and 'dad' or 'boyfriend')
+        end
+
+        boyfriendGhostData.strumTime = strumTime
+        updateGData(getProperty('characterPlayingAsDad') and 'dad' or 'boyfriend')
+    end
+
+    -- GF
+    if not isSustainNote and isGF then
+        if strumTime == gfGhostData.strumTime then
+            createGhost('gf')
+        end
+
+        gfGhostData.strumTime = strumTime
+        updateGData('gf')
+    end
+end
+
+function opponentNoteHit(id, direction, noteType, isSustainNote)
+    local strumTime = getPropertyFromGroup('notes', id, 'strumTime')
+    local noteType = getPropertyFromGroup('notes', id, 'noteType')
+
+    local isGF = getPropertyFromGroup('notes', id, 'gfNote') or noteType == 'Gf Sing'
+
+    -- DAD or BOYFRIEND
+    if not isSustainNote and not isGF then
+        if strumTime == dadGhostData.strumTime then
+            createGhost(getProperty('characterPlayingAsDad') and 'boyfriend' or 'dad')
+        end
+
+        dadGhostData.strumTime = strumTime
+        updateGData(getProperty('characterPlayingAsDad') and 'boyfriend' or 'dad')
+    end
+
+    -- GF
+    if not isSustainNote and isGF then
+        if strumTime == gfGhostData.strumTime then
+            createGhost('gf')
+        end
+
+        gfGhostData.strumTime = strumTime
+        updateGData('gf')
+    end
+end
+
+function createGhost(char)
+    local songPos = math.floor(math.abs(getSongPosition()))
+    local imageFile = getProperty(char .. '.imageFile')
+    local animName = getProperty(char .. '.animation.curAnim.name')
+    local isMultiAtlas = getProperty(char .. '.isMultiAtlas')
+    local newPath = isMultiAtlas and (imageFile:match("(.+)/[^/]+$") or imageFile) .. '/' .. animName or imageFile
+
+    local ghostTag = char .. 'Ghost' .. songPos
+    makeAnimatedLuaSprite(ghostTag, newPath, getProperty(char .. '.x'), getProperty(char .. '.y'))
+    addLuaSprite(ghostTag, false)
+
+    setProperty(ghostTag .. '.scale.x', getProperty(char .. '.scale.x'))
+    setProperty(ghostTag .. '.scale.y', getProperty(char .. '.scale.y'))
+    setProperty(ghostTag .. '.flipX', getProperty(char .. '.flipX'))
+    setProperty(ghostTag .. '.antialiasing', getProperty(char .. '.antialiasing'))
+    if getProperty('inSilhouette') then
+        setProperty(ghostTag .. '.color', 0x000000)
+    end
+    setProperty(ghostTag .. '.alpha', getProperty(char .. '.alpha'))
+    setProperty(ghostTag .. '.blend', getProperty(char .. '.blend'))
+    setProperty(ghostTag .. '.shader', getProperty(char .. '.shader'))
+    doTweenAlpha(ghostTag .. 'delete', ghostTag, 0, 0.4)
+
+    local data = getGhostData(char)
+    setProperty(ghostTag .. '.animation.frameName', data.frameName)
+    setProperty(ghostTag .. '.offset.x', data.offsetX)
+    setProperty(ghostTag .. '.offset.y', data.offsetY)
+    setObjectOrder(ghostTag, getObjectOrder(char .. 'Group') - 1)
+end
+
+function onTweenCompleted(tag)
+    if tag:sub(-6) == 'delete' then
+        removeLuaSprite(tag:sub(1, -7), true)
+    end
+end
+
+function updateGData(char)
+    local data = getGhostData(char)
+    data.frameName = getProperty(char .. '.animation.frameName')
+    data.offsetX = getProperty(char .. '.offset.x')
+    data.offsetY = getProperty(char .. '.offset.y')
+end
+
+function getGhostData(char)
+    if char == 'boyfriend' then
+        return boyfriendGhostData
+    elseif char == 'dad' then
+        return dadGhostData
+    elseif char == 'gf' then
+        return gfGhostData
+    end
+end`;
+        }
+
+        function getLuaCameraTemplate() {
+            return `-- Camera Zoom and Shake Script
+local zoomAmount = 0.03
+local hudZoomAmount = 0.05
+
+function onBeatHit()
+    -- Zoom on every beat
+    if curBeat % 4 == 0 then
+        triggerEvent('Add Camera Zoom', zoomAmount, hudZoomAmount)
+    end
+end
+
+function onEvent(name, value1, value2)
+    if name == 'Camera Shake' then
+        -- Custom camera shake event
+        local intensity = tonumber(value1) or 0.01
+        local duration = tonumber(value2) or 0.5
+        
+        cameraShake('camGame', intensity, duration)
+        cameraShake('camHUD', intensity * 0.5, duration)
+    end
+end
+
+function onCreate()
+    -- Initialize camera settings
+    setProperty('camGame.zoom', getProperty('defaultCamZoom'))
+end`;
+        }
+
+        function getLuaHUDTemplate() {
+            return `-- HUD Management Script
+function onCreate()
+    -- Create custom HUD elements
+    makeLuaText('scoreText', 'Score: 0', 0, 20, 680)
+    setTextSize('scoreText', 32)
+    setTextAlignment('scoreText', 'left')
+    addLuaText('scoreText')
+    
+    makeLuaText('missText', 'Misses: 0', 0, screenWidth - 200, 680)
+    setTextSize('missText', 32)
+    setTextAlignment('missText', 'right')
+    addLuaText('missText')
+end
+
+function onUpdatePost()
+    -- Update HUD elements
+    setTextString('scoreText', 'Score: ' .. score)
+    setTextString('missText', 'Misses: ' .. misses)
+end
+
+function onEvent(name, value1, value2)
+    if name == 'Toggle HUD' then
+        -- Toggle HUD visibility
+        local visible = value1 == '1' or value1 == 'true'
+        setProperty('camHUD.visible', visible)
+    end
+end`;
+        }
+
+        function getLuaCustomEventTemplate() {
+            return `-- Custom Events Template
+function onEvent(name, value1, value2)
+    if name == 'My Custom Event' then
+        -- Handle your custom event here
+        debugPrint('Custom event triggered!')
+        debugPrint('Value 1: ' .. value1)
+        debugPrint('Value 2: ' .. value2)
+        
+        -- Example: Flash the screen
+        if value1 == 'flash' then
+            cameraFlash('camOther', 'FFFFFF', 0.5)
+        end
+        
+        -- Example: Change character alpha
+        if value1 == 'fade' then
+            local targetAlpha = tonumber(value2) or 1
+            doTweenAlpha('characterFade', 'boyfriend', targetAlpha, 1, 'linear')
+        end
+    end
+end
+
+function onCreate()
+    -- Setup code here
+    debugPrint('Custom event script loaded!')
+end
+
+function onCreatePost()
+    -- Post-creation code here
+end`;
+        }
+
+        function downloadGenLua() {
+            if (!state.generation.lua) {
+                showStatus('❌ No script to download', 'error', 'genLuaStatus');
+                return;
+            }
+
+            const template = document.querySelector('input[name="luaTemplate"]:checked').value;
+            const filenames = {
+                ghost: 'ghostTapping.lua',
+                camera: 'cameraEffects.lua',
+                hud: 'hudManager.lua',
+                custom: 'customEvents.lua'
+            };
+
+            downloadText(state.generation.lua, filenames[template] || 'script.lua');
+            showStatus('✅ Lua script download started!', 'success', 'genLuaStatus');
+        }
+
+        function clearGenLua() {
+            document.getElementById('outputGenLua').value = '';
+            document.getElementById('downloadGenLuaBtn').disabled = true;
+            state.generation.lua = null;
+            hideStatus('genLuaStatus');
         }
 
         // ==================== UTILITY FUNCTIONS ====================
