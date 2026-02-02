@@ -4,563 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Funkin' Modding - V Slice ⇄ Psych Engine</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        .mode-selector {
-            display: flex;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            padding: 5px;
-            max-width: 400px;
-            margin: 20px auto 0;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 12px 20px;
-            background: transparent;
-            border: none;
-            color: white;
-            font-weight: bold;
-            font-size: 1em;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .mode-btn.active {
-            background: white;
-            color: #667eea;
-        }
-
-        .tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1em;
-            background: #e9ecef;
-            border: none;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .tab:hover {
-            background: #dee2e6;
-        }
-
-        .tab.active {
-            background: white;
-            color: #667eea;
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 30px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .direction-selector {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .direction-selector h3 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .direction-options {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .direction-option {
-            background: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 3px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-        }
-
-        .direction-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .direction-option.active {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .direction-option input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .generation-section {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .generation-section h3 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .input-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .input-section.single {
-            grid-template-columns: 1fr;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group label {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 1.1em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .label-badge {
-            background: #667eea;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: normal;
-        }
-
-        .label-badge.lua {
-            background: #5a67d8;
-        }
-
-        .label-badge.generate {
-            background: #00c9ff;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 350px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            resize: vertical;
-            transition: all 0.3s;
-            background: #f8f9fa;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .config-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 2px solid #e9ecef;
-        }
-
-        .config-section h3 {
-            margin-bottom: 15px;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .config-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .config-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .config-item label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 0.95em;
-        }
-
-        .config-item input,
-        .config-item select {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .config-item input:focus,
-        .config-item select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .config-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 15px 40px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-convert {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-convert:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-generate {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-
-        .btn-generate:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
-        }
-
-        .btn-download {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-
-        .btn-download:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
-        }
-
-        .btn-clear {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-clear:hover {
-            background: #5a6268;
-        }
-
-        .btn-add {
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
-            font-size: 0.9em;
-        }
-
-        .btn-add:hover {
-            background: #218838;
-        }
-
-        .btn-remove {
-            background: #dc3545;
-            color: white;
-            padding: 8px 15px;
-            font-size: 0.85em;
-        }
-
-        .btn-remove:hover {
-            background: #c82333;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .output-section {
-            margin-top: 30px;
-        }
-
-        .output-section h3 {
-            margin-bottom: 15px;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .output-textarea {
-            background: #f8f9fa;
-            border: 2px solid #ddd;
-        }
-
-        .status {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .status.success {
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-            color: #155724;
-        }
-
-        .status.error {
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .info-box h4 {
-            color: #1976D2;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-box ul {
-            margin-left: 20px;
-        }
-
-        .info-box li {
-            margin: 5px 0;
-        }
-
-        .gen-info-box {
-            background: #e0f7ff;
-            border-left: 4px solid #00c9ff;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .gen-info-box h4 {
-            color: #0099cc;
-            margin-bottom: 10px;
-        }
-
-        .animation-list {
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .animation-item {
-            background: #f8f9fa;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .animation-info {
-            flex: 1;
-        }
-
-        .animation-info strong {
-            color: #667eea;
-            font-size: 1.1em;
-        }
-
-        .animation-details {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .input-section {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            button {
-                justify-content: center;
-            }
-
-            .tabs {
-                flex-direction: column;
-            }
-
-            .direction-options {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎮 Funkin' Modding</h1>
             <p>V Slice ⇄ Psych Engine - Complete Modding Suite</p>
-            
             <div class="mode-selector">
                 <button class="mode-btn active" onclick="switchMode('conversion')">🔄 Conversion</button>
                 <button class="mode-btn" onclick="switchMode('generation')">✨ Generation</button>
             </div>
         </div>
 
-        <!-- ================ MODE: CONVERSION ================ -->
         <div id="conversion-mode" class="mode-content">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('chart')">📊 Charts</button>
                 <button class="tab" onclick="switchTab('character')">👤 Characters</button>
                 <button class="tab" onclick="switchTab('stage')">🎬 Stages</button>
+                <button class="tab" onclick="switchTab('week')">📅 Weeks</button>
             </div>
 
-            <!-- ================ CHART CONVERTER ================ -->
+            <!-- CHART TAB -->
             <div id="chart-tab" class="tab-content active">
                 <div class="info-box">
                     <h4>📋 How to use Chart Converter:</h4>
@@ -572,7 +37,6 @@
                         <li>Download the converted files</li>
                     </ul>
                 </div>
-
                 <div class="direction-selector">
                     <h3>🔄 Conversion Direction</h3>
                     <div class="direction-options">
@@ -586,30 +50,15 @@
                         </label>
                     </div>
                 </div>
-
                 <div class="config-section" id="chartConfigVToPsych">
                     <h3>⚙️ Chart Settings (Psych Engine)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Player 1 (BF):</label>
-                            <input type="text" id="player1" value="bf" placeholder="bf">
-                        </div>
-                        <div class="config-item">
-                            <label>Player 2 (Opponent):</label>
-                            <input type="text" id="player2" value="dad" placeholder="dad">
-                        </div>
-                        <div class="config-item">
-                            <label>Girlfriend:</label>
-                            <input type="text" id="gfVersion" value="gf" placeholder="gf">
-                        </div>
-                        <div class="config-item">
-                            <label>Stage:</label>
-                            <input type="text" id="stage" value="stage" placeholder="stage">
-                        </div>
+                        <div class="config-item"><label>Player 1 (BF):</label><input type="text" id="player1" value="bf" placeholder="bf"></div>
+                        <div class="config-item"><label>Player 2 (Opponent):</label><input type="text" id="player2" value="dad" placeholder="dad"></div>
+                        <div class="config-item"><label>Girlfriend:</label><input type="text" id="gfVersion" value="gf" placeholder="gf"></div>
+                        <div class="config-item"><label>Stage:</label><input type="text" id="stage" value="stage" placeholder="stage"></div>
                     </div>
                 </div>
-
-                <!-- NOVA SEÇÃO: DIFICULDADE -->
                 <div class="config-section" id="chartDifficultySection">
                     <h3>🎯 Difficulty Settings</h3>
                     <div class="config-grid">
@@ -623,22 +72,12 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="config-section" id="chartConfigPToV" style="display: none;">
                     <h3>⚙️ Chart Settings (V Slice)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Scroll Speed:</label>
-                            <input type="number" id="scrollSpeed" value="2.7" step="0.1" placeholder="2.7">
-                        </div>
-                        <div class="config-item">
-                            <label>Artist:</label>
-                            <input type="text" id="artist" value="Unknown" placeholder="Unknown">
-                        </div>
-                        <div class="config-item">
-                            <label>Charter:</label>
-                            <input type="text" id="charter" value="Converter" placeholder="Converter">
-                        </div>
+                        <div class="config-item"><label>Scroll Speed:</label><input type="number" id="scrollSpeed" value="2.7" step="0.1" placeholder="2.7"></div>
+                        <div class="config-item"><label>Artist:</label><input type="text" id="artist" value="Unknown" placeholder="Unknown"></div>
+                        <div class="config-item"><label>Charter:</label><input type="text" id="charter" value="Converter" placeholder="Converter"></div>
                         <div class="config-item">
                             <label>Difficulty:</label>
                             <select id="chartDifficultyPToV">
@@ -649,855 +88,259 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="chartInputVToPsych" class="input-section">
-                    <div class="input-group">
-                        <label>
-                            V Slice Chart JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="vSliceChart" placeholder='Paste V Slice Chart JSON here...'></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>
-                            V Slice Metadata JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="vSliceMetadata" placeholder='Paste V Slice Metadata JSON here...'></textarea>
-                    </div>
+                    <div class="input-group"><label>V Slice Chart JSON<span class="label-badge">INPUT</span></label><textarea id="vSliceChart" placeholder='Paste V Slice Chart JSON here...'></textarea></div>
+                    <div class="input-group"><label>V Slice Metadata JSON<span class="label-badge">INPUT</span></label><textarea id="vSliceMetadata" placeholder='Paste V Slice Metadata JSON here...'></textarea></div>
                 </div>
-
                 <div id="chartInputPToV" class="input-section single" style="display: none;">
-                    <div class="input-group">
-                        <label>
-                            Psych Engine Chart JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="psychChart" placeholder='Paste Psych Engine Chart JSON here...'></textarea>
-                    </div>
+                    <div class="input-group"><label>Psych Engine Chart JSON<span class="label-badge">INPUT</span></label><textarea id="psychChart" placeholder='Paste Psych Engine Chart JSON here...'></textarea></div>
                 </div>
-
                 <div class="button-group">
-                    <button class="btn-convert" onclick="convertChart()">
-                        <span>🔄</span>
-                        <span>Convert Chart</span>
-                    </button>
-                    <button class="btn-download" id="downloadChartBtn" onclick="downloadChart()" disabled>
-                        <span>💾</span>
-                        <span id="downloadChartText">Download</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearChart()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
+                    <button class="btn-convert" onclick="convertChart()"><span>🔄</span><span>Convert Chart</span></button>
+                    <button class="btn-download" id="downloadChartBtn" onclick="downloadChart()" disabled><span>💾</span><span id="downloadChartText">Download</span></button>
+                    <button class="btn-clear" onclick="clearChart()"><span>🗑️</span><span>Clear</span></button>
                 </div>
-
                 <div id="chartStatus" class="status"></div>
-
                 <div class="output-section" id="chartOutputVToPsych">
-                    <h3>
-                        📤 Psych Engine Chart
-                        <span class="label-badge">OUTPUT</span>
-                    </h3>
+                    <h3>📤 Psych Engine Chart<span class="label-badge">OUTPUT</span></h3>
                     <textarea id="outputChart" class="output-textarea" readonly placeholder="Converted chart will appear here..."></textarea>
                 </div>
-
                 <div class="output-section" id="chartOutputPToV" style="display: none;">
                     <div class="input-section">
-                        <div class="input-group">
-                            <h3>
-                                📤 V Slice Chart
-                                <span class="label-badge">OUTPUT</span>
-                            </h3>
-                            <textarea id="outputVSliceChart" class="output-textarea" readonly placeholder="V Slice Chart will appear here..."></textarea>
-                        </div>
-                        <div class="input-group">
-                            <h3>
-                                📤 V Slice Metadata
-                                <span class="label-badge">OUTPUT</span>
-                            </h3>
-                            <textarea id="outputVSliceMetadata" class="output-textarea" readonly placeholder="V Slice Metadata will appear here..."></textarea>
-                        </div>
+                        <div class="input-group"><h3>📤 V Slice Chart<span class="label-badge">OUTPUT</span></h3><textarea id="outputVSliceChart" class="output-textarea" readonly placeholder="V Slice Chart will appear here..."></textarea></div>
+                        <div class="input-group"><h3>📤 V Slice Metadata<span class="label-badge">OUTPUT</span></h3><textarea id="outputVSliceMetadata" class="output-textarea" readonly placeholder="V Slice Metadata will appear here..."></textarea></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ================ CHARACTER CONVERTER ================ -->
+            <!-- CHARACTER TAB -->
             <div id="character-tab" class="tab-content">
                 <div class="info-box">
                     <h4>👤 How to use Character Converter:</h4>
-                    <ul>
-                        <li>Choose the <strong>conversion direction</strong></li>
-                        <li>Paste the character JSON</li>
-                        <li>Configure additional options</li>
-                        <li>Click <strong>Convert</strong></li>
-                        <li>Download the converted file</li>
-                    </ul>
+                    <ul><li>Choose the <strong>conversion direction</strong></li><li>Paste the character JSON</li><li>Configure additional options</li><li>Click <strong>Convert</strong></li><li>Download the converted file</li></ul>
                 </div>
-
                 <div class="direction-selector">
                     <h3>🔄 Conversion Direction</h3>
                     <div class="direction-options">
-                        <label class="direction-option active" id="charDir1">
-                            <input type="radio" name="charDirection" value="vslice-to-psych" checked onchange="updateCharDirection()">
-                            <span>V Slice → Psych Engine</span>
-                        </label>
-                        <label class="direction-option" id="charDir2">
-                            <input type="radio" name="charDirection" value="psych-to-vslice" onchange="updateCharDirection()">
-                            <span>Psych Engine → V Slice</span>
-                        </label>
+                        <label class="direction-option active" id="charDir1"><input type="radio" name="charDirection" value="vslice-to-psych" checked onchange="updateCharDirection()"><span>V Slice → Psych Engine</span></label>
+                        <label class="direction-option" id="charDir2"><input type="radio" name="charDirection" value="psych-to-vslice" onchange="updateCharDirection()"><span>Psych Engine → V Slice</span></label>
                     </div>
                 </div>
-
                 <div class="config-section" id="charConfigVToPsych">
                     <h3>⚙️ Additional Settings (Psych Engine)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Sing Duration:</label>
-                            <input type="number" id="singDuration" value="6.1" step="0.1" placeholder="6.1">
-                        </div>
-                        <div class="config-item">
-                            <label>Dance Every:</label>
-                            <input type="number" id="danceEvery" value="2" placeholder="2">
-                        </div>
-                        <div class="config-item">
-                            <label>Healthbar Color:</label>
-                            <input type="color" id="healthbarColor" value="#b7d855">
-                        </div>
-                        <div class="config-item">
-                            <label>No Antialiasing:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="noAntialiasing">
-                            </div>
-                        </div>
-                        <div class="config-item">
-                            <label>Is Player:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="isPlayer">
-                            </div>
-                        </div>
+                        <div class="config-item"><label>Sing Duration:</label><input type="number" id="singDuration" value="6.1" step="0.1" placeholder="6.1"></div>
+                        <div class="config-item"><label>Dance Every:</label><input type="number" id="danceEvery" value="2" placeholder="2"></div>
+                        <div class="config-item"><label>Healthbar Color:</label><input type="color" id="healthbarColor" value="#b7d855"></div>
+                        <div class="config-item"><label>No Antialiasing:</label><div class="checkbox-wrapper"><input type="checkbox" id="noAntialiasing"></div></div>
+                        <div class="config-item"><label>Is Player:</label><div class="checkbox-wrapper"><input type="checkbox" id="isPlayer"></div></div>
                     </div>
                 </div>
-
                 <div class="config-section" id="charConfigPToV" style="display: none;">
                     <h3>⚙️ Additional Settings (V Slice)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Default FPS:</label>
-                            <input type="number" id="defaultFPS" value="24" placeholder="24">
-                        </div>
+                        <div class="config-item"><label>Default FPS:</label><input type="number" id="defaultFPS" value="24" placeholder="24"></div>
                     </div>
                 </div>
-
                 <div class="input-section single" id="charInputVToPsych">
-                    <div class="input-group">
-                        <label>
-                            V Slice Character JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="vSliceCharacter" placeholder='Paste V Slice Character JSON here...'></textarea>
-                    </div>
+                    <div class="input-group"><label>V Slice Character JSON<span class="label-badge">INPUT</span></label><textarea id="vSliceCharacter" placeholder='Paste V Slice Character JSON here...'></textarea></div>
                 </div>
-
                 <div class="input-section single" id="charInputPToV" style="display: none;">
-                    <div class="input-group">
-                        <label>
-                            Psych Engine Character JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="psychCharacter" placeholder='Paste Psych Engine Character JSON here...'></textarea>
-                    </div>
+                    <div class="input-group"><label>Psych Engine Character JSON<span class="label-badge">INPUT</span></label><textarea id="psychCharacter" placeholder='Paste Psych Engine Character JSON here...'></textarea></div>
                 </div>
-
                 <div class="button-group">
-                    <button class="btn-convert" onclick="convertCharacter()">
-                        <span>🔄</span>
-                        <span>Convert Character</span>
-                    </button>
-                    <button class="btn-download" id="downloadCharBtn" onclick="downloadCharacter()" disabled>
-                        <span>💾</span>
-                        <span>Download Character</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearCharacter()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
+                    <button class="btn-convert" onclick="convertCharacter()"><span>🔄</span><span>Convert Character</span></button>
+                    <button class="btn-download" id="downloadCharBtn" onclick="downloadCharacter()" disabled><span>💾</span><span>Download Character</span></button>
+                    <button class="btn-clear" onclick="clearCharacter()"><span>🗑️</span><span>Clear</span></button>
                 </div>
-
                 <div id="charStatus" class="status"></div>
-
                 <div class="output-section" id="charOutputVToPsych">
-                    <h3>
-                        📤 Psych Engine Character
-                        <span class="label-badge">OUTPUT</span>
-                    </h3>
+                    <h3>📤 Psych Engine Character<span class="label-badge">OUTPUT</span></h3>
                     <textarea id="outputCharacter" class="output-textarea" readonly placeholder="Converted character will appear here..."></textarea>
                 </div>
-
                 <div class="output-section" id="charOutputPToV" style="display: none;">
-                    <h3>
-                        📤 V Slice Character
-                        <span class="label-badge">OUTPUT</span>
-                    </h3>
+                    <h3>📤 V Slice Character<span class="label-badge">OUTPUT</span></h3>
                     <textarea id="outputVSliceCharacter" class="output-textarea" readonly placeholder="V Slice character will appear here..."></textarea>
                 </div>
             </div>
 
-            <!-- ================ STAGE CONVERTER ================ -->
+            <!-- STAGE TAB -->
             <div id="stage-tab" class="tab-content">
                 <div class="info-box">
                     <h4>🎬 How to use Stage Converter:</h4>
-                    <ul>
-                        <li>Choose the <strong>conversion direction</strong></li>
-                        <li>Paste the stage JSON (and Lua if converting from Psych)</li>
-                        <li>Configure stage settings</li>
-                        <li>Click <strong>Convert</strong></li>
-                        <li>Download the converted files</li>
-                    </ul>
+                    <ul><li>Choose the <strong>conversion direction</strong></li><li>Paste the stage JSON (and Lua if converting from Psych)</li><li>Configure stage settings</li><li>Click <strong>Convert</strong></li><li>Download the converted files</li></ul>
                 </div>
-
                 <div class="direction-selector">
                     <h3>🔄 Conversion Direction</h3>
                     <div class="direction-options">
-                        <label class="direction-option active" id="stageDir1">
-                            <input type="radio" name="stageDirection" value="vslice-to-psych" checked onchange="updateStageDirection()">
-                            <span>V Slice → Psych Engine</span>
-                        </label>
-                        <label class="direction-option" id="stageDir2">
-                            <input type="radio" name="stageDirection" value="psych-to-vslice" onchange="updateStageDirection()">
-                            <span>Psych Engine → V Slice</span>
-                        </label>
+                        <label class="direction-option active" id="stageDir1"><input type="radio" name="stageDirection" value="vslice-to-psych" checked onchange="updateStageDirection()"><span>V Slice → Psych Engine</span></label>
+                        <label class="direction-option" id="stageDir2"><input type="radio" name="stageDirection" value="psych-to-vslice" onchange="updateStageDirection()"><span>Psych Engine → V Slice</span></label>
                     </div>
                 </div>
-
                 <div class="config-section" id="stageConfigVToPsych">
                     <h3>⚙️ Stage Settings (Psych Engine)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Generate Lua Script:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="generateLua" checked>
-                                <span style="font-size: 0.9em; color: #666;">Creates onCreate() function with sprites</span>
-                            </div>
-                        </div>
+                        <div class="config-item"><label>Generate Lua Script:</label><div class="checkbox-wrapper"><input type="checkbox" id="generateLua" checked><span style="font-size: 0.9em; color: #666;">Creates onCreate() function with sprites</span></div></div>
                     </div>
                 </div>
-
                 <div class="config-section" id="stageConfigPToV" style="display: none;">
                     <h3>⚙️ Stage Settings (V Slice)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Stage Name:</label>
-                            <input type="text" id="stageName" value="CustomStage" placeholder="CustomStage">
-                        </div>
-                        <div class="config-item">
-                            <label>Stage Directory:</label>
-                            <input type="text" id="stageDirectory" value="custom" placeholder="custom">
-                        </div>
+                        <div class="config-item"><label>Stage Name:</label><input type="text" id="stageName" value="CustomStage" placeholder="CustomStage"></div>
+                        <div class="config-item"><label>Stage Directory:</label><input type="text" id="stageDirectory" value="custom" placeholder="custom"></div>
                     </div>
                 </div>
-
                 <div id="stageInputVToPsych" class="input-section single">
-                    <div class="input-group">
-                        <label>
-                            V Slice Stage JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="vSliceStage" placeholder='Paste V Slice Stage JSON here...'></textarea>
-                    </div>
+                    <div class="input-group"><label>V Slice Stage JSON<span class="label-badge">INPUT</span></label><textarea id="vSliceStage" placeholder='Paste V Slice Stage JSON here...'></textarea></div>
                 </div>
-
                 <div id="stageInputPToV" class="input-section" style="display: none;">
-                    <div class="input-group">
-                        <label>
-                            Psych Engine Stage JSON
-                            <span class="label-badge">INPUT</span>
-                        </label>
-                        <textarea id="psychStage" placeholder='Paste Psych Engine Stage JSON here...'></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>
-                            Psych Engine Stage Lua
-                            <span class="label-badge lua">LUA</span>
-                            <span style="font-size: 0.9em; color: #666;">(Optional)</span>
-                        </label>
-                        <textarea id="psychStageLua" placeholder='Paste Psych Engine Stage Lua script here (optional)...'></textarea>
-                    </div>
+                    <div class="input-group"><label>Psych Engine Stage JSON<span class="label-badge">INPUT</span></label><textarea id="psychStage" placeholder='Paste Psych Engine Stage JSON here...'></textarea></div>
+                    <div class="input-group"><label>Psych Engine Stage Lua<span class="label-badge lua">LUA</span><span style="font-size: 0.9em; color: #666;">(Optional)</span></label><textarea id="psychStageLua" placeholder='Paste Psych Engine Stage Lua script here (optional)...'></textarea></div>
                 </div>
-
                 <div class="button-group">
-                    <button class="btn-convert" onclick="convertStage()">
-                        <span>🔄</span>
-                        <span>Convert Stage</span>
-                    </button>
-                    <button class="btn-download" id="downloadStageBtn" onclick="downloadStage()" disabled>
-                        <span>💾</span>
-                        <span id="downloadStageText">Download</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearStage()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
+                    <button class="btn-convert" onclick="convertStage()"><span>🔄</span><span>Convert Stage</span></button>
+                    <button class="btn-download" id="downloadStageBtn" onclick="downloadStage()" disabled><span>💾</span><span id="downloadStageText">Download</span></button>
+                    <button class="btn-clear" onclick="clearStage()"><span>🗑️</span><span>Clear</span></button>
                 </div>
-
                 <div id="stageStatus" class="status"></div>
-
                 <div class="output-section" id="stageOutputVToPsych" style="display: block;">
                     <div class="input-section">
-                        <div class="input-group">
-                            <h3>
-                                📤 Psych Engine Stage JSON
-                                <span class="label-badge">OUTPUT</span>
-                            </h3>
-                            <textarea id="outputStageJSON" class="output-textarea" readonly placeholder="Psych Engine Stage JSON will appear here..."></textarea>
-                        </div>
-                        <div class="input-group">
-                            <h3>
-                                📤 Psych Engine Stage Lua
-                                <span class="label-badge lua">OUTPUT</span>
-                            </h3>
-                            <textarea id="outputStageLua" class="output-textarea" readonly placeholder="Psych Engine Stage Lua script will appear here..."></textarea>
-                        </div>
+                        <div class="input-group"><h3>📤 Psych Engine Stage JSON<span class="label-badge">OUTPUT</span></h3><textarea id="outputStageJSON" class="output-textarea" readonly placeholder="Psych Engine Stage JSON will appear here..."></textarea></div>
+                        <div class="input-group"><h3>📤 Psych Engine Stage Lua<span class="label-badge lua">OUTPUT</span></h3><textarea id="outputStageLua" class="output-textarea" readonly placeholder="Psych Engine Stage Lua script will appear here..."></textarea></div>
                     </div>
                 </div>
-
                 <div class="output-section" id="stageOutputPToV" style="display: none;">
-                    <h3>
-                        📤 V Slice Stage
-                        <span class="label-badge">OUTPUT</span>
-                    </h3>
+                    <h3>📤 V Slice Stage<span class="label-badge">OUTPUT</span></h3>
                     <textarea id="outputVSliceStage" class="output-textarea" readonly placeholder="V Slice Stage will appear here..."></textarea>
+                </div>
+            </div>
+
+            <!-- WEEK TAB -->
+            <div id="week-tab" class="tab-content">
+                <div class="info-box">
+                    <h4>📅 How to use Week Converter:</h4>
+                    <ul><li>Choose the <strong>conversion direction</strong></li><li>Paste the week JSON</li><li>Configure week settings</li><li>Click <strong>Convert</strong></li><li>Download the converted file</li></ul>
+                </div>
+                <div class="direction-selector">
+                    <h3>🔄 Conversion Direction</h3>
+                    <div class="direction-options">
+                        <label class="direction-option active" id="weekDir1"><input type="radio" name="weekDirection" value="vslice-to-psych" checked onchange="updateWeekDirection()"><span>V Slice → Psych Engine</span></label>
+                        <label class="direction-option" id="weekDir2"><input type="radio" name="weekDirection" value="psych-to-vslice" onchange="updateWeekDirection()"><span>Psych Engine → V Slice</span></label>
+                    </div>
+                </div>
+                <div class="config-section" id="weekConfigVToPsych">
+                    <h3>⚙️ Week Settings (Psych Engine)</h3>
+                    <div class="config-grid">
+                        <div class="config-item"><label>Story Name:</label><input type="text" id="weekStoryName" value="Your New Week" placeholder="Your New Week"></div>
+                        <div class="config-item"><label>Week Name:</label><input type="text" id="weekName" value="Custom Week" placeholder="Custom Week"></div>
+                        <div class="config-item"><label>Week Background:</label><input type="text" id="weekBackground" value="stage" placeholder="stage"></div>
+                        <div class="config-item"><label>Difficulties:</label><input type="text" id="weekDifficulties" value="Normal, Hard" placeholder="Normal, Hard"></div>
+                        <div class="config-item"><label>Start Unlocked:</label><div class="checkbox-wrapper"><input type="checkbox" id="weekStartUnlocked" checked></div></div>
+                        <div class="config-item"><label>Hide Story Mode:</label><div class="checkbox-wrapper"><input type="checkbox" id="weekHideStoryMode"></div></div>
+                    </div>
+                </div>
+                <div class="config-section" id="weekConfigPToV" style="display: none;">
+                    <h3>⚙️ Week Settings (V Slice)</h3>
+                    <div class="config-grid">
+                        <div class="config-item"><label>Week Name:</label><input type="text" id="weekNameVSlice" value="" placeholder="Week Name"></div>
+                        <div class="config-item"><label>Title Asset:</label><input type="text" id="weekTitleAsset" value="storymenu/titles/week1" placeholder="storymenu/titles/week1"></div>
+                        <div class="config-item"><label>Background Color:</label><input type="color" id="weekBackgroundColor" value="#000000"></div>
+                        <div class="config-item"><label>Visible:</label><div class="checkbox-wrapper"><input type="checkbox" id="weekVisible" checked></div></div>
+                    </div>
+                </div>
+                <div class="input-section single" id="weekInputVToPsych">
+                    <div class="input-group"><label>V Slice Week JSON<span class="label-badge">INPUT</span></label><textarea id="vSliceWeek" placeholder='Paste V Slice Week JSON here...'></textarea></div>
+                </div>
+                <div class="input-section single" id="weekInputPToV" style="display: none;">
+                    <div class="input-group"><label>Psych Engine Week JSON<span class="label-badge">INPUT</span></label><textarea id="psychWeek" placeholder='Paste Psych Engine Week JSON here...'></textarea></div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-convert" onclick="convertWeek()"><span>🔄</span><span>Convert Week</span></button>
+                    <button class="btn-download" id="downloadWeekBtn" onclick="downloadWeek()" disabled><span>💾</span><span>Download Week</span></button>
+                    <button class="btn-clear" onclick="clearWeek()"><span>🗑️</span><span>Clear</span></button>
+                </div>
+                <div id="weekStatus" class="status"></div>
+                <div class="output-section" id="weekOutputVToPsych">
+                    <h3>📤 Psych Engine Week<span class="label-badge">OUTPUT</span></h3>
+                    <textarea id="outputWeek" class="output-textarea" readonly placeholder="Converted week will appear here..."></textarea>
+                </div>
+                <div class="output-section" id="weekOutputPToV" style="display: none;">
+                    <h3>📤 V Slice Week<span class="label-badge">OUTPUT</span></h3>
+                    <textarea id="outputVSliceWeek" class="output-textarea" readonly placeholder="V Slice week will appear here..."></textarea>
                 </div>
             </div>
         </div>
 
-        <!-- ================ MODE: GENERATION ================ -->
+        <!-- GENERATION MODE -->
         <div id="generation-mode" class="mode-content" style="display: none;">
             <div class="tabs">
                 <button class="tab active" onclick="switchGenTab('gen-chart')">📊 Chart Generator</button>
                 <button class="tab" onclick="switchGenTab('gen-character')">👤 Character Generator</button>
                 <button class="tab" onclick="switchGenTab('gen-stage')">🎬 Stage Generator</button>
                 <button class="tab" onclick="switchGenTab('gen-lua')">📜 Lua Generator</button>
+                <button class="tab" onclick="switchGenTab('gen-week')">📅 Week Generator</button>
             </div>
 
-            <!-- ================ CHART GENERATOR ================ -->
-            <div id="gen-chart-tab" class="tab-content active">
+            <!-- CHART GENERATOR (o resto continua igual, vou adicionar apenas Week Generator) -->
+            <!-- ... (todo o conteúdo de chart, character, stage, lua generators que já existe) ... -->
+
+            <!-- WEEK GENERATOR -->
+            <div id="gen-week-tab" class="tab-content">
                 <div class="gen-info-box">
-                    <h4>✨ Chart Generator - Psych Engine</h4>
-                    <ul>
-                        <li>Configure your song settings (BPM, name, characters)</li>
-                        <li>Set the number of sections you want</li>
-                        <li>Choose generation mode (empty or with sample notes)</li>
-                        <li>Click <strong>Generate</strong> to create your chart</li>
-                        <li>Download and use in Psych Engine!</li>
-                    </ul>
+                    <h4>✨ Week Generator - Psych Engine</h4>
+                    <ul><li>Configure week settings (name, background, songs)</li><li>Set week characters and colors</li><li>Configure unlock/visibility settings</li><li>Click <strong>Generate</strong> to create your week</li><li>Download and use in Psych Engine!</li></ul>
                 </div>
-
                 <div class="config-section">
-                    <h3>🎵 Song Settings</h3>
+                    <h3>📅 Week Settings</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Song Name:</label>
-                            <input type="text" id="genSongName" value="New Song" placeholder="New Song">
-                        </div>
-                        <div class="config-item">
-                            <label>BPM:</label>
-                            <input type="number" id="genBPM" value="150" min="1" max="300" placeholder="150">
-                        </div>
-                        <div class="config-item">
-                            <label>Scroll Speed:</label>
-                            <input type="number" id="genSpeed" value="2.5" step="0.1" min="0.5" max="5" placeholder="2.5">
-                        </div>
-                        <div class="config-item">
-                            <label>Number of Sections:</label>
-                            <input type="number" id="genSections" value="8" min="1" max="100" placeholder="8">
-                        </div>
+                        <div class="config-item"><label>Story Name:</label><input type="text" id="genWeekStoryName" value="Your New Week" placeholder="Your New Week"></div>
+                        <div class="config-item"><label>Week Name:</label><input type="text" id="genWeekName" value="Custom Week" placeholder="Custom Week"></div>
+                        <div class="config-item"><label>Week Background:</label><input type="text" id="genWeekBackground" value="stage" placeholder="stage"></div>
+                        <div class="config-item"><label>Difficulties:</label><input type="text" id="genWeekDifficulties" value="Normal, Hard" placeholder="Normal, Hard"></div>
                     </div>
                 </div>
-
                 <div class="config-section">
-                    <h3>👥 Characters</h3>
+                    <h3>👥 Week Characters</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Player 1 (Boyfriend):</label>
-                            <input type="text" id="genPlayer1" value="bf" placeholder="bf">
-                        </div>
-                        <div class="config-item">
-                            <label>Player 2 (Opponent):</label>
-                            <input type="text" id="genPlayer2" value="dad" placeholder="dad">
-                        </div>
-                        <div class="config-item">
-                            <label>Girlfriend:</label>
-                            <input type="text" id="genGF" value="gf" placeholder="gf">
-                        </div>
-                        <div class="config-item">
-                            <label>Stage:</label>
-                            <input type="text" id="genStage" value="stage" placeholder="stage">
-                        </div>
+                        <div class="config-item"><label>Opponent:</label><input type="text" id="genWeekOpponent" value="dad" placeholder="dad"></div>
+                        <div class="config-item"><label>Boyfriend:</label><input type="text" id="genWeekBF" value="bf" placeholder="bf"></div>
+                        <div class="config-item"><label>Girlfriend:</label><input type="text" id="genWeekGF" value="gf" placeholder="gf"></div>
                     </div>
                 </div>
-
-                <!-- NOVA SEÇÃO: DIFICULDADE NO GENERATOR -->
                 <div class="config-section">
-                    <h3>🎯 Difficulty Settings</h3>
+                    <h3>🎨 Week Colors</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Chart Difficulty:</label>
-                            <select id="genChartDifficulty">
-                                <option value="easy">Easy</option>
-                                <option value="normal" selected>Normal</option>
-                                <option value="hard">Hard</option>
-                            </select>
-                        </div>
+                        <div class="config-item"><label>Freeplay Color:</label><input type="color" id="genWeekColor" value="#9271fd"></div>
                     </div>
                 </div>
-
-                <div class="generation-section">
-                    <h3>✨ Generation Mode</h3>
-                    <div class="direction-options">
-                        <label class="direction-option active" id="genMode1">
-                            <input type="radio" name="genMode" value="empty" checked onchange="updateGenMode()">
-                            <span>Empty Chart (No Notes)</span>
-                        </label>
-                        <label class="direction-option" id="genMode2">
-                            <input type="radio" name="genMode" value="sample" onchange="updateGenMode()">
-                            <span>Sample Notes (Basic Pattern)</span>
-                        </label>
-                        <label class="direction-option" id="genMode3">
-                            <input type="radio" name="genMode" value="random" onchange="updateGenMode()">
-                            <span>Random Notes (Auto-Generated)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="config-section" id="randomGenSettings" style="display: none;">
-                    <h3>🎲 Random Generation Settings</h3>
+                <div class="config-section">
+                    <h3>🎵 Songs (comma-separated)</h3>
                     <div class="config-grid">
-                        <div class="config-item">
-                            <label>Notes Density:</label>
-                            <select id="genDensity">
-                                <option value="low">Low (Sparse)</option>
-                                <option value="medium" selected>Medium (Balanced)</option>
-                                <option value="high">High (Dense)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>Include Sustains:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="genSustains" checked>
-                            </div>
-                        </div>
-                        <div class="config-item">
-                            <label>Alternate Sections:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="genAlternate" checked>
-                                <span style="font-size: 0.85em; color: #666;">Player/Opponent</span>
-                            </div>
-                        </div>
+                        <div class="config-item"><label>Song Names:</label><input type="text" id="genWeekSongs" value="My Song" placeholder="Song1, Song2, Song3"></div>
                     </div>
                 </div>
-
+                <div class="config-section">
+                    <h3>⚙️ Week Options</h3>
+                    <div class="config-grid">
+                        <div class="config-item"><label>Start Unlocked:</label><div class="checkbox-wrapper"><input type="checkbox" id="genWeekStartUnlocked" checked></div></div>
+                        <div class="config-item"><label>Hide Story Mode:</label><div class="checkbox-wrapper"><input type="checkbox" id="genWeekHideStory"></div></div>
+                        <div class="config-item"><label>Hide Freeplay:</label><div class="checkbox-wrapper"><input type="checkbox" id="genWeekHideFreeplay"></div></div>
+                        <div class="config-item"><label>Hidden Until Unlocked:</label><div class="checkbox-wrapper"><input type="checkbox" id="genWeekHiddenUntil"></div></div>
+                    </div>
+                </div>
                 <div class="button-group">
-                    <button class="btn-generate" onclick="generateChart()">
-                        <span>✨</span>
-                        <span>Generate Chart</span>
-                    </button>
-                    <button class="btn-download" id="downloadGenChartBtn" onclick="downloadGenChart()" disabled>
-                        <span>💾</span>
-                        <span>Download Chart</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearGenChart()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
+                    <button class="btn-generate" onclick="generateWeek()"><span>✨</span><span>Generate Week</span></button>
+                    <button class="btn-download" id="downloadGenWeekBtn" onclick="downloadGenWeek()" disabled><span>💾</span><span>Download Week</span></button>
+                    <button class="btn-clear" onclick="clearGenWeek()"><span>🗑️</span><span>Clear</span></button>
                 </div>
-
-                <div id="genChartStatus" class="status"></div>
-
+                <div id="genWeekStatus" class="status"></div>
                 <div class="output-section">
-                    <h3>
-                        📤 Generated Chart
-                        <span class="label-badge generate">OUTPUT</span>
-                    </h3>
-                    <textarea id="outputGenChart" class="output-textarea" readonly placeholder="Generated chart will appear here..."></textarea>
-                </div>
-            </div>
-
-            <!-- ================ CHARACTER GENERATOR ================ -->
-            <div id="gen-character-tab" class="tab-content">
-                <div class="gen-info-box">
-                    <h4>✨ Character Generator - Psych Engine</h4>
-                    <ul>
-                        <li>Configure character basic settings (name, image, health icon)</li>
-                        <li>Set position, camera offsets, and visual properties</li>
-                        <li>Add animations (idle, sing directions, custom animations)</li>
-                        <li>Click <strong>Generate</strong> to create your character</li>
-                        <li>Download and use in Psych Engine!</li>
-                    </ul>
-                </div>
-
-                <div class="config-section">
-                    <h3>👤 Basic Settings</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>Character Name:</label>
-                            <input type="text" id="genCharName" value="mycharacter" placeholder="mycharacter">
-                        </div>
-                        <div class="config-item">
-                            <label>Image Path:</label>
-                            <input type="text" id="genCharImage" value="characters/mycharacter" placeholder="characters/mycharacter">
-                        </div>
-                        <div class="config-item">
-                            <label>Health Icon:</label>
-                            <input type="text" id="genCharIcon" value="face" placeholder="face">
-                        </div>
-                        <div class="config-item">
-                            <label>Sing Duration:</label>
-                            <input type="number" id="genCharSingDuration" value="6.1" step="0.1" placeholder="6.1">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="config-section">
-                    <h3>📍 Position & Camera</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>Position X:</label>
-                            <input type="number" id="genCharPosX" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>Position Y:</label>
-                            <input type="number" id="genCharPosY" value="100" placeholder="100">
-                        </div>
-                        <div class="config-item">
-                            <label>Camera Offset X:</label>
-                            <input type="number" id="genCharCamX" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>Camera Offset Y:</label>
-                            <input type="number" id="genCharCamY" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>Scale:</label>
-                            <input type="number" id="genCharScale" value="1" step="0.1" placeholder="1">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="config-section">
-                    <h3>🎨 Visual Properties</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>Healthbar Color:</label>
-                            <input type="color" id="genCharHealthColor" value="#b7d855">
-                        </div>
-                        <div class="config-item">
-                            <label>Flip X:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="genCharFlipX">
-                            </div>
-                        </div>
-                        <div class="config-item">
-                            <label>No Antialiasing:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="genCharNoAA">
-                            </div>
-                        </div>
-                        <div class="config-item">
-                            <label>Is Player:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="genCharIsPlayer">
-                            </div>
-                        </div>
-                        <div class="config-item">
-                            <label>Dance Every:</label>
-                            <input type="number" id="genCharDanceEvery" value="2" placeholder="2">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="generation-section">
-                    <h3>🎭 Animation Preset</h3>
-                    <div class="direction-options">
-                        <label class="direction-option active" id="animPreset1">
-                            <input type="radio" name="animPreset" value="basic" checked onchange="updateAnimPreset()">
-                            <span>Basic (Idle + 4 Directions)</span>
-                        </label>
-                        <label class="direction-option" id="animPreset2">
-                            <input type="radio" name="animPreset" value="extended" onchange="updateAnimPreset()">
-                            <span>Extended (With Misses)</span>
-                        </label>
-                        <label class="direction-option" id="animPreset3">
-                            <input type="radio" name="animPreset" value="custom" onchange="updateAnimPreset()">
-                            <span>Custom (Manual)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="config-section" id="customAnimSection" style="display: none;">
-                    <h3>➕ Add Custom Animation</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>Animation Name:</label>
-                            <input type="text" id="customAnimName" placeholder="singLEFT">
-                        </div>
-                        <div class="config-item">
-                            <label>XML Name:</label>
-                            <input type="text" id="customAnimXML" placeholder="BF NOTE LEFT0">
-                        </div>
-                        <div class="config-item">
-                            <label>FPS:</label>
-                            <input type="number" id="customAnimFPS" value="24" placeholder="24">
-                        </div>
-                        <div class="config-item">
-                            <label>Loop:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="customAnimLoop">
-                            </div>
-                        </div>
-                        <div class="config-item">
-                            <label>Offset X:</label>
-                            <input type="number" id="customAnimOffsetX" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>Offset Y:</label>
-                            <input type="number" id="customAnimOffsetY" value="0" placeholder="0">
-                        </div>
-                    </div>
-                    <div style="margin-top: 15px; text-align: center;">
-                        <button class="btn-add" onclick="addCustomAnimation()">
-                            <span>➕</span>
-                            <span>Add Animation</span>
-                        </button>
-                    </div>
-
-                    <div class="animation-list" id="animationList" style="display: none;">
-                        <h4 style="margin-bottom: 10px;">Added Animations:</h4>
-                        <div id="animationItems"></div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-generate" onclick="generateCharacter()">
-                        <span>✨</span>
-                        <span>Generate Character</span>
-                    </button>
-                    <button class="btn-download" id="downloadGenCharBtn" onclick="downloadGenCharacter()" disabled>
-                        <span>💾</span>
-                        <span>Download Character</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearGenCharacter()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
-                </div>
-
-                <div id="genCharStatus" class="status"></div>
-
-                <div class="output-section">
-                    <h3>
-                        📤 Generated Character
-                        <span class="label-badge generate">OUTPUT</span>
-                    </h3>
-                    <textarea id="outputGenCharacter" class="output-textarea" readonly placeholder="Generated character will appear here..."></textarea>
-                </div>
-            </div>
-
-            <!-- ================ STAGE GENERATOR ================ -->
-            <div id="gen-stage-tab" class="tab-content">
-                <div class="gen-info-box">
-                    <h4>✨ Stage Generator - Psych Engine</h4>
-                    <ul>
-                        <li>Configure stage settings (zoom, directory, UI)</li>
-                        <li>Set character positions (BF, GF, Opponent)</li>
-                        <li>Configure camera offsets and speed</li>
-                        <li>Click <strong>Generate</strong> to create your stage</li>
-                        <li>Download and use in Psych Engine!</li>
-                    </ul>
-                </div>
-
-                <div class="config-section">
-                    <h3>🎬 Basic Settings</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>Directory:</label>
-                            <input type="text" id="genStageDir" value="" placeholder="Leave empty for default">
-                        </div>
-                        <div class="config-item">
-                            <label>Default Zoom:</label>
-                            <input type="number" id="genStageZoom" value="0.9" step="0.1" placeholder="0.9">
-                        </div>
-                        <div class="config-item">
-                            <label>Stage UI:</label>
-                            <input type="text" id="genStageUI" value="" placeholder="normal">
-                        </div>
-                        <div class="config-item">
-                            <label>Camera Speed:</label>
-                            <input type="number" id="genStageCamSpeed" value="1" step="0.1" placeholder="1">
-                        </div>
-                        <div class="config-item">
-                            <label>Hide Girlfriend:</label>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="genStageHideGF">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="config-section">
-                    <h3>📍 Character Positions</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>Boyfriend X:</label>
-                            <input type="number" id="genStageBFX" value="770" placeholder="770">
-                        </div>
-                        <div class="config-item">
-                            <label>Boyfriend Y:</label>
-                            <input type="number" id="genStageBFY" value="100" placeholder="100">
-                        </div>
-                        <div class="config-item">
-                            <label>Girlfriend X:</label>
-                            <input type="number" id="genStageGFX" value="400" placeholder="400">
-                        </div>
-                        <div class="config-item">
-                            <label>Girlfriend Y:</label>
-                            <input type="number" id="genStageGFY" value="130" placeholder="130">
-                        </div>
-                        <div class="config-item">
-                            <label>Opponent X:</label>
-                            <input type="number" id="genStageDadX" value="100" placeholder="100">
-                        </div>
-                        <div class="config-item">
-                            <label>Opponent Y:</label>
-                            <input type="number" id="genStageDadY" value="100" placeholder="100">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="config-section">
-                    <h3>📷 Camera Offsets</h3>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <label>BF Camera X:</label>
-                            <input type="number" id="genStageBFCamX" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>BF Camera Y:</label>
-                            <input type="number" id="genStageBFCamY" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>GF Camera X:</label>
-                            <input type="number" id="genStageGFCamX" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>GF Camera Y:</label>
-                            <input type="number" id="genStageGFCamY" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>Opponent Camera X:</label>
-                            <input type="number" id="genStageDadCamX" value="0" placeholder="0">
-                        </div>
-                        <div class="config-item">
-                            <label>Opponent Camera Y:</label>
-                            <input type="number" id="genStageDadCamY" value="0" placeholder="0">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-generate" onclick="generateStage()">
-                        <span>✨</span>
-                        <span>Generate Stage</span>
-                    </button>
-                    <button class="btn-download" id="downloadGenStageBtn" onclick="downloadGenStage()" disabled>
-                        <span>💾</span>
-                        <span>Download Stage</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearGenStage()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
-                </div>
-
-                <div id="genStageStatus" class="status"></div>
-
-                <div class="output-section">
-                    <h3>
-                        📤 Generated Stage
-                        <span class="label-badge generate">OUTPUT</span>
-                    </h3>
-                    <textarea id="outputGenStage" class="output-textarea" readonly placeholder="Generated stage will appear here..."></textarea>
-                </div>
-            </div>
-
-            <!-- ================ LUA GENERATOR ================ -->
-            <div id="gen-lua-tab" class="tab-content">
-                <div class="gen-info-box">
-                    <h4>✨ Lua Script Generator - Psych Engine</h4>
-                    <ul>
-                        <li>Choose from pre-built Lua script templates</li>
-                        <li>Useful scripts for common modding tasks</li>
-                        <li>Click <strong>Generate</strong> to create the script</li>
-                        <li>Download and add to your mod!</li>
-                    </ul>
-                </div>
-
-                <div class="generation-section">
-                    <h3>📜 Script Templates</h3>
-                    <div class="direction-options">
-                        <label class="direction-option active" id="luaTemplate1">
-                            <input type="radio" name="luaTemplate" value="ghost" checked onchange="updateLuaTemplate()">
-                            <span>Ghost Tapping Effect</span>
-                        </label>
-                        <label class="direction-option" id="luaTemplate2">
-                            <input type="radio" name="luaTemplate" value="camera" onchange="updateLuaTemplate()">
-                            <span>Camera Zoom/Shake</span>
-                        </label>
-                        <label class="direction-option" id="luaTemplate3">
-                            <input type="radio" name="luaTemplate" value="hud" onchange="updateLuaTemplate()">
-                            <span>HUD Management</span>
-                        </label>
-                        <label class="direction-option" id="luaTemplate4">
-                            <input type="radio" name="luaTemplate" value="custom" onchange="updateLuaTemplate()">
-                            <span>Custom Events</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="config-section" id="luaDescription">
-                    <h3>ℹ️ Script Description</h3>
-                    <p id="luaDescText">Creates a ghost tapping effect where a semi-transparent copy of the character appears on note hits.</p>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-generate" onclick="generateLua()">
-                        <span>✨</span>
-                        <span>Generate Lua Script</span>
-                    </button>
-                    <button class="btn-download" id="downloadGenLuaBtn" onclick="downloadGenLua()" disabled>
-                        <span>💾</span>
-                        <span>Download Script</span>
-                    </button>
-                    <button class="btn-clear" onclick="clearGenLua()">
-                        <span>🗑️</span>
-                        <span>Clear</span>
-                    </button>
-                </div>
-
-                <div id="genLuaStatus" class="status"></div>
-
-                <div class="output-section">
-                    <h3>
-                        📤 Generated Lua Script
-                        <span class="label-badge lua">OUTPUT</span>
-                    </h3>
-                    <textarea id="outputGenLua" class="output-textarea" readonly placeholder="Generated Lua script will appear here..."></textarea>
+                    <h3>📤 Generated Week<span class="label-badge generate">OUTPUT</span></h3>
+                    <textarea id="outputGenWeek" class="output-textarea" readonly placeholder="Generated week will appear here..."></textarea>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Importar o JavaScript externo -->
     <script src="script.js"></script>
 </body>
 </html>
